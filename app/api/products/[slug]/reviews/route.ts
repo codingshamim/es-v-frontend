@@ -29,18 +29,27 @@ export async function GET(
       );
     }
 
-    const [reviews, total] = await Promise.all([
+    const [reviews, total, avgResult] = await Promise.all([
       Review.find({ product: product._id })
         .sort({ createdAt: -1 })
         .skip((page - 1) * limit)
         .limit(limit)
         .lean(),
       Review.countDocuments({ product: product._id }),
+      Review.aggregate([
+        { $match: { product: product._id } },
+        { $group: { _id: null, avg: { $avg: "$rating" } } },
+      ]),
     ]);
+
+    const average = avgResult[0]?.avg != null
+      ? Math.round(Number(avgResult[0].avg) * 10) / 10
+      : 0;
 
     return Response.json({
       success: true,
       data: reviews,
+      stats: { average, total },
       pagination: {
         page,
         limit,

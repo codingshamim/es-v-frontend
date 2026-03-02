@@ -266,7 +266,7 @@ export default function UsersPage() {
   const roleBadge = (role: string) => {
     const styles: Record<string, string> = {
       admin:
-        "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400",
+        "bg-white/20 text-gray-900 dark:bg-white/10 dark:text-white",
       moderator:
         "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
       user: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
@@ -311,8 +311,8 @@ export default function UsersPage() {
       label: "Admins / Moderators",
       value: stats.adminsAndModerators,
       icon: ShieldCheckIcon,
-      color: "text-teal-500",
-      bg: "bg-teal-50 dark:bg-teal-900/20",
+      color: "text-gray-700 dark:text-white",
+      bg: "bg-white/10 dark:bg-white/5",
     },
     {
       label: "New This Month",
@@ -333,7 +333,7 @@ export default function UsersPage() {
           type="text"
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
-          className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-[#222] bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white focus:ring-2 focus:ring-accent-teal focus:border-transparent outline-none transition"
+          className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white focus:ring-2 focus:ring-white/50 dark:focus:ring-white/50 focus:border-transparent outline-none transition"
           placeholder="Full name"
         />
       </div>
@@ -345,7 +345,7 @@ export default function UsersPage() {
           type="email"
           value={form.email}
           onChange={(e) => setForm({ ...form, email: e.target.value })}
-          className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-[#222] bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white focus:ring-2 focus:ring-accent-teal focus:border-transparent outline-none transition"
+          className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white focus:ring-2 focus:ring-white/50 dark:focus:ring-white/50 focus:border-transparent outline-none transition"
           placeholder="email@example.com"
         />
       </div>
@@ -357,7 +357,7 @@ export default function UsersPage() {
           type="tel"
           value={form.phone}
           onChange={(e) => setForm({ ...form, phone: e.target.value })}
-          className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-[#222] bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white focus:ring-2 focus:ring-accent-teal focus:border-transparent outline-none transition"
+          className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white focus:ring-2 focus:ring-white/50 dark:focus:ring-white/50 focus:border-transparent outline-none transition"
           placeholder="+880..."
         />
       </div>
@@ -370,7 +370,7 @@ export default function UsersPage() {
             type="password"
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
-            className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-[#222] bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white focus:ring-2 focus:ring-accent-teal focus:border-transparent outline-none transition"
+            className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white focus:ring-2 focus:ring-white/50 dark:focus:ring-white/50 focus:border-transparent outline-none transition"
             placeholder="Min 6 characters"
           />
         </div>
@@ -389,7 +389,7 @@ export default function UsersPage() {
                 e.target.value === "user" ? [] : form.permissions,
             })
           }
-          className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-[#222] bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white focus:ring-2 focus:ring-accent-teal focus:border-transparent outline-none transition"
+          className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white focus:ring-2 focus:ring-white/50 dark:focus:ring-white/50 focus:border-transparent outline-none transition"
         >
           <option value="user">User</option>
           <option value="admin">Admin</option>
@@ -411,7 +411,7 @@ export default function UsersPage() {
                   type="checkbox"
                   checked={form.permissions.includes(perm.key)}
                   onChange={() => togglePermission(perm.key)}
-                  className="rounded border-gray-300 dark:border-[#333] text-accent-teal focus:ring-accent-teal bg-white dark:bg-[#0a0a0a]"
+                  className="rounded border-gray-300 dark:border-[#333] text-white focus:ring-white/50 dark:focus:ring-white/50 bg-white dark:bg-[#0a0a0a]"
                 />
                 {perm.label}
               </label>
@@ -429,13 +429,13 @@ export default function UsersPage() {
             onClick={() => setForm({ ...form, isActive: !form.isActive })}
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
               form.isActive
-                ? "bg-accent-teal"
+                ? "bg-white dark:bg-white"
                 : "bg-gray-300 dark:bg-gray-700"
             }`}
           >
             <span
               className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                form.isActive ? "translate-x-6" : "translate-x-1"
+                form.isActive ? "translate-x-6 bg-black dark:bg-black" : "translate-x-1 bg-white"
               }`}
             />
           </button>
@@ -467,7 +467,7 @@ export default function UsersPage() {
         {statCards.map((card) => (
           <div
             key={card.label}
-            className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] p-5"
+            className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 p-5"
           >
             <div className="flex items-center justify-between">
               <div>
@@ -487,7 +487,7 @@ export default function UsersPage() {
       </div>
 
       {/* Filters & Actions */}
-      <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] p-5">
+      <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 p-5">
         <div className="flex flex-col lg:flex-row lg:items-center gap-4">
           <div className="relative flex-1">
             <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -496,14 +496,14 @@ export default function UsersPage() {
               placeholder="Search by name, email, or phone..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 dark:border-[#222] bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-accent-teal focus:border-transparent outline-none transition"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-white/50 dark:focus:ring-white/50 focus:border-transparent outline-none transition"
             />
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <select
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
-              className="px-3 py-2.5 rounded-xl border border-gray-300 dark:border-[#222] bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white focus:ring-2 focus:ring-accent-teal focus:border-transparent outline-none transition text-sm"
+              className="px-3 py-2.5 rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white focus:ring-2 focus:ring-white/50 dark:focus:ring-white/50 focus:border-transparent outline-none transition text-sm"
             >
               <option value="">All Roles</option>
               <option value="user">User</option>
@@ -513,7 +513,7 @@ export default function UsersPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2.5 rounded-xl border border-gray-300 dark:border-[#222] bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white focus:ring-2 focus:ring-accent-teal focus:border-transparent outline-none transition text-sm"
+              className="px-3 py-2.5 rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white focus:ring-2 focus:ring-white/50 dark:focus:ring-white/50 focus:border-transparent outline-none transition text-sm"
             >
               <option value="">All Status</option>
               <option value="active">Active</option>
@@ -524,7 +524,7 @@ export default function UsersPage() {
                 setForm(INITIAL_FORM);
                 setShowCreateModal(true);
               }}
-              className="flex items-center gap-2 px-4 py-2.5 bg-accent-teal hover:bg-accent-teal/90 text-white rounded-xl text-sm font-medium transition"
+              className="flex items-center gap-2 px-4 py-2.5 bg-white text-black hover:bg-gray-100 dark:bg-white dark:text-black dark:hover:bg-gray-200 border border-gray-200 dark:border-white/20 rounded-xl text-sm font-medium transition"
             >
               <PlusIcon className="w-5 h-5" />
               Add User
@@ -534,11 +534,11 @@ export default function UsersPage() {
       </div>
 
       {/* Users Table */}
-      <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] overflow-hidden">
+      <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50 dark:bg-[#0a0a0a] border-b border-gray-200 dark:border-[#1a1a1a]">
+              <tr className="bg-gray-50 dark:bg-[#0a0a0a] border-b border-gray-200 dark:border-white/10">
                 <th className="text-left px-5 py-3.5 font-medium text-gray-500 dark:text-gray-400">
                   Name
                 </th>
@@ -562,11 +562,11 @@ export default function UsersPage() {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-[#1a1a1a]">
+            <tbody className="divide-y divide-gray-100 dark:divide-white/10">
               {loading ? (
                 <tr>
                   <td colSpan={7} className="py-20 text-center">
-                    <Spinner size="lg" className="mx-auto text-accent-teal" />
+                    <Spinner size="lg" className="mx-auto text-white dark:text-white" />
                   </td>
                 </tr>
               ) : users.length === 0 ? (
@@ -611,7 +611,7 @@ export default function UsersPage() {
                       <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => openEdit(user)}
-                          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[#1a1a1a] text-gray-500 dark:text-gray-400 hover:text-accent-teal transition"
+                          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 dark:text-gray-400 hover:text-white dark:hover:text-white transition"
                           title="Edit"
                         >
                           <PencilIcon className="w-4 h-4" />
@@ -634,7 +634,7 @@ export default function UsersPage() {
 
         {/* Pagination */}
         {!loading && totalPages > 1 && (
-          <div className="flex items-center justify-between px-5 py-4 border-t border-gray-200 dark:border-[#1a1a1a]">
+          <div className="flex items-center justify-between px-5 py-4 border-t border-gray-200 dark:border-white/10">
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Showing {(page - 1) * limit + 1}–
               {Math.min(page * limit, totalCount)} of {totalCount}
@@ -643,7 +643,7 @@ export default function UsersPage() {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-[#222] text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1a1a1a] disabled:opacity-40 disabled:cursor-not-allowed transition"
+                className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed transition"
               >
                 Previous
               </button>
@@ -674,8 +674,8 @@ export default function UsersPage() {
                       onClick={() => setPage(p)}
                       className={`px-3 py-1.5 text-sm rounded-lg border transition ${
                         p === page
-                          ? "bg-accent-teal text-white border-accent-teal"
-                          : "border-gray-300 dark:border-[#222] text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1a1a1a]"
+                          ? "bg-white text-black border-white dark:bg-white dark:text-black dark:border-white"
+                          : "border-gray-300 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5"
                       }`}
                     >
                       {p}
@@ -685,7 +685,7 @@ export default function UsersPage() {
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-[#222] text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1a1a1a] disabled:opacity-40 disabled:cursor-not-allowed transition"
+                className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed transition"
               >
                 Next
               </button>
@@ -701,23 +701,23 @@ export default function UsersPage() {
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowCreateModal(false)}
           />
-          <div className="relative w-full max-w-lg mx-4 bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-[#1a1a1a]">
+          <div className="relative w-full max-w-lg mx-4 bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-white/10">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Create User
               </h2>
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[#1a1a1a] text-gray-400 transition"
+                className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 text-gray-400 transition"
               >
                 <XMarkIcon className="w-5 h-5" />
               </button>
             </div>
             <div className="p-6">{renderModalFields("create")}</div>
-            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 dark:border-[#1a1a1a]">
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 dark:border-white/10">
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1a1a1a] rounded-xl transition"
+                className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 rounded-xl transition"
               >
                 Cancel
               </button>
@@ -726,7 +726,7 @@ export default function UsersPage() {
                 disabled={
                   actionLoading || !form.name || !form.email || !form.password
                 }
-                className="flex items-center gap-2 px-5 py-2 bg-accent-teal hover:bg-accent-teal/90 text-white rounded-xl text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition"
+                className="flex items-center gap-2 px-5 py-2 bg-white text-black hover:bg-gray-100 dark:bg-white dark:text-black dark:hover:bg-gray-200 border border-gray-200 dark:border-white/20 rounded-xl text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition"
               >
                 {actionLoading && <Spinner size="sm" />}
                 Create User
@@ -746,8 +746,8 @@ export default function UsersPage() {
               setSelectedUser(null);
             }}
           />
-          <div className="relative w-full max-w-lg mx-4 bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-[#1a1a1a]">
+          <div className="relative w-full max-w-lg mx-4 bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-white/10">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Edit User
               </h2>
@@ -756,26 +756,26 @@ export default function UsersPage() {
                   setShowEditModal(false);
                   setSelectedUser(null);
                 }}
-                className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[#1a1a1a] text-gray-400 transition"
+                className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 text-gray-400 transition"
               >
                 <XMarkIcon className="w-5 h-5" />
               </button>
             </div>
             <div className="p-6">{renderModalFields("edit")}</div>
-            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 dark:border-[#1a1a1a]">
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 dark:border-white/10">
               <button
                 onClick={() => {
                   setShowEditModal(false);
                   setSelectedUser(null);
                 }}
-                className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1a1a1a] rounded-xl transition"
+                className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 rounded-xl transition"
               >
                 Cancel
               </button>
               <button
                 onClick={handleEdit}
                 disabled={actionLoading || !form.name || !form.email}
-                className="flex items-center gap-2 px-5 py-2 bg-accent-teal hover:bg-accent-teal/90 text-white rounded-xl text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition"
+                className="flex items-center gap-2 px-5 py-2 bg-white text-black hover:bg-gray-100 dark:bg-white dark:text-black dark:hover:bg-gray-200 border border-gray-200 dark:border-white/20 rounded-xl text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition"
               >
                 {actionLoading && <Spinner size="sm" />}
                 Save Changes
@@ -795,7 +795,7 @@ export default function UsersPage() {
               setSelectedUser(null);
             }}
           />
-          <div className="relative w-full max-w-sm mx-4 bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] shadow-2xl p-6">
+          <div className="relative w-full max-w-sm mx-4 bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 shadow-2xl p-6">
             <div className="text-center">
               <div className="mx-auto w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center mb-4">
                 <TrashIcon className="w-6 h-6 text-red-500" />
@@ -817,7 +817,7 @@ export default function UsersPage() {
                   setShowDeleteDialog(false);
                   setSelectedUser(null);
                 }}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-[#222] hover:bg-gray-50 dark:hover:bg-[#1a1a1a] rounded-xl transition"
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl transition"
               >
                 Cancel
               </button>

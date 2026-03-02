@@ -267,13 +267,17 @@ function OrderSummary({
   subtotal,
   savings,
   itemCount,
+  deliveryCharge,
+  couponDiscount = 0,
 }: {
   subtotal: number;
   savings: number;
   itemCount: number;
+  deliveryCharge: number;
+  couponDiscount?: number;
 }) {
-  const deliveryCharge = 120;
-  const total = subtotal + deliveryCharge;
+  const total = Math.max(0, subtotal - couponDiscount + deliveryCharge);
+  const totalSavings = savings + couponDiscount;
 
   return (
     <div className="rounded-2xl border border-gray-100 dark:border-[#1a1a1a] bg-white dark:bg-[#0a0a0a] p-5">
@@ -294,10 +298,21 @@ function OrderSummary({
         {savings > 0 && (
           <div className="flex items-center justify-between">
             <span className="text-gray-600 dark:text-gray-400 font-bengali">
-              ডিসকাউন্ট
+              প্রোডাক্ট ডিসকাউন্ট
             </span>
             <span className="font-medium text-accent-green">
               -{formatPrice(savings)}
+            </span>
+          </div>
+        )}
+
+        {couponDiscount > 0 && (
+          <div className="flex items-center justify-between">
+            <span className="text-gray-600 dark:text-gray-400 font-bengali">
+              কুপন ডিসকাউন্ট
+            </span>
+            <span className="font-medium text-accent-green">
+              -{formatPrice(couponDiscount)}
             </span>
           </div>
         )}
@@ -323,10 +338,10 @@ function OrderSummary({
         </div>
       </div>
 
-      {savings > 0 && (
+      {totalSavings > 0 && (
         <div className="mt-4 rounded-xl bg-green-50 dark:bg-green-900/10 border border-green-100 dark:border-green-900/20 px-4 py-2.5 text-center">
           <p className="text-sm font-semibold text-accent-green font-bengali">
-            আপনি সেভ করছেন {formatPrice(savings)}!
+            আপনি সেভ করছেন {formatPrice(totalSavings)}!
           </p>
         </div>
       )}
@@ -411,6 +426,8 @@ function OrderSummary({
   );
 }
 
+const DEFAULT_DELIVERY_CHARGE = 120;
+
 export default function CartPage() {
   const {
     items,
@@ -424,12 +441,52 @@ export default function CartPage() {
 
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(null);
+  const [couponError, setCouponError] = useState("");
+  const [couponLoading, setCouponLoading] = useState(false);
 
   const subtotal = getCartTotal();
   const savings = getCartSavings();
   const itemCount = getCartCount();
-  const deliveryCharge = 120;
-  const total = subtotal + deliveryCharge;
+  const deliveryCharge = DEFAULT_DELIVERY_CHARGE;
+  const couponDiscount = appliedCoupon?.discount ?? 0;
+  const total = Math.max(0, subtotal - couponDiscount + deliveryCharge);
+
+  async function handleApplyCoupon() {
+    const code = couponCode.trim().toUpperCase();
+    if (!code) {
+      setCouponError("কুপন কোড লিখুন");
+      return;
+    }
+    setCouponLoading(true);
+    setCouponError("");
+    try {
+      const res = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, subtotal }),
+      });
+      const data = await res.json();
+      if (data.valid && data.discount != null) {
+        setAppliedCoupon({ code: data.code || code, discount: data.discount });
+        setCouponError("");
+      } else {
+        setAppliedCoupon(null);
+        setCouponError(data.message || "কুপন প্রয়োগ করা যায়নি");
+      }
+    } catch {
+      setCouponError("কুপন যাচাই করতে ব্যর্থ");
+      setAppliedCoupon(null);
+    } finally {
+      setCouponLoading(false);
+    }
+  }
+
+  function handleRemoveCoupon() {
+    setAppliedCoupon(null);
+    setCouponCode("");
+    setCouponError("");
+  }
 
   function handleDeleteClick(cartItemId: string) {
     setDeleteTarget(cartItemId);
@@ -450,6 +507,37 @@ export default function CartPage() {
     <>
       <main className="min-h-[60vh] pb-48 lg:pb-12">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
+          {/* Progress Steps */}
+          <div className="mb-8 flex items-center justify-center gap-0">
+            {/* Step 1 - কার্ট (current) */}
+            <div className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-teal text-white text-sm font-bold">
+                ১
+              </div>
+              <span className="text-sm font-bold text-accent-teal font-bengali">কার্ট</span>
+            </div>
+
+            <div className="mx-3 h-px w-12 bg-gray-300 dark:bg-gray-600 sm:w-20" />
+
+            {/* Step 2 - চেকআউট (upcoming, tab) */}
+            <Link href="/checkout" className="flex items-center gap-2 rounded-lg transition-colors hover:opacity-80">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 dark:bg-[#1a1a1a] text-gray-400 dark:text-gray-500 text-sm font-bold">
+                ২
+              </div>
+              <span className="text-sm font-medium text-gray-400 dark:text-gray-500 font-bengali">চেকআউট</span>
+            </Link>
+
+            <div className="mx-3 h-px w-12 bg-gray-300 dark:bg-gray-600 sm:w-20" />
+
+            {/* Step 3 - সম্পন্ন (upcoming, tab) */}
+            <Link href="/order-confirmed" className="flex items-center gap-2 rounded-lg transition-colors hover:opacity-80">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 dark:bg-[#1a1a1a] text-gray-400 dark:text-gray-500 text-sm font-bold">
+                ৩
+              </div>
+              <span className="text-sm font-medium text-gray-400 dark:text-gray-500 font-bengali">সম্পন্ন</span>
+            </Link>
+          </div>
+
           {/* Header */}
           <div className="mb-6 flex items-center justify-between">
             {/* Mobile item count */}
@@ -487,18 +575,49 @@ export default function CartPage() {
                 <h3 className="mb-3 text-sm font-semibold text-black dark:text-white font-bengali">
                   কুপন কোড
                 </h3>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value)}
-                    placeholder="কুপন কোড লিখুন"
-                    className="flex-1 rounded-lg border border-gray-200 dark:border-[#1a1a1a] bg-gray-50 dark:bg-[#111] px-4 py-2.5 text-sm text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none transition-colors focus:border-accent-teal font-bengali"
-                  />
-                  <Button variant="secondary" size="sm" className="font-bengali">
-                    প্রয়োগ
-                  </Button>
-                </div>
+                {appliedCoupon ? (
+                  <div className="flex items-center justify-between gap-2 rounded-lg bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-800/30 px-4 py-2.5">
+                    <span className="text-sm font-medium text-accent-green font-bengali">
+                      {appliedCoupon.code} — {formatPrice(appliedCoupon.discount)} ডিসকাউন্ট
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleRemoveCoupon}
+                      className="text-xs font-medium text-gray-500 hover:text-accent-red dark:text-gray-400 dark:hover:text-red-400 transition-colors font-bengali"
+                    >
+                      সরান
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={couponCode}
+                        onChange={(e) => {
+                          setCouponCode(e.target.value);
+                          setCouponError("");
+                        }}
+                        placeholder="কুপন কোড লিখুন"
+                        className="flex-1 rounded-lg border border-gray-200 dark:border-[#1a1a1a] bg-gray-50 dark:bg-[#111] px-4 py-2.5 text-sm text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none transition-colors focus:border-accent-teal font-bengali"
+                      />
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="font-bengali"
+                        onClick={handleApplyCoupon}
+                        disabled={couponLoading}
+                      >
+                        {couponLoading ? "..." : "প্রয়োগ"}
+                      </Button>
+                    </div>
+                    {couponError && (
+                      <p className="mt-2 text-xs text-red-500 dark:text-red-400 font-bengali">
+                        {couponError}
+                      </p>
+                    )}
+                  </>
+                )}
               </div>
             </div>
 
@@ -509,6 +628,8 @@ export default function CartPage() {
                   subtotal={subtotal}
                   savings={savings}
                   itemCount={itemCount}
+                  deliveryCharge={deliveryCharge}
+                  couponDiscount={couponDiscount}
                 />
               </div>
             </div>
@@ -526,6 +647,11 @@ export default function CartPage() {
             <p className="text-lg font-bold text-accent-teal">
               {formatPrice(total)}
             </p>
+            {savings + couponDiscount > 0 && (
+              <p className="text-[10px] text-accent-green font-bengali">
+                সেভ {formatPrice(savings + couponDiscount)}
+              </p>
+            )}
           </div>
           <Link href="/checkout" className="flex-1">
             <Button variant="secondary" fullWidth className="font-bengali">

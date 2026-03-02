@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import Link from "next/link";
 
 import { ShoppingCartIcon } from "@/components/icons";
 import { ChevronLeftIcon, ChevronRightIcon } from "@/components/icons";
@@ -14,6 +15,7 @@ interface Thumbnail {
 
 interface Product {
   _id: string;
+  slug?: string;
   name: string;
   pricing: {
     regularPrice: number;
@@ -195,14 +197,15 @@ export function HeroSlider({ products }: HeroSliderProps) {
               </span>
             </div>
 
-            {/* Add to Cart Button */}
-            <button
-              className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3 bg-white dark:bg-black cursor-pointer active:scale-[98%] border dark:border-[#333333] rounded-lg text-black dark:text-white font-medium transition-all hover:bg-gray-100 dark:hover:bg-[#1a1a1a] hover:shadow-lg"
-              aria-label="Add to cart"
+            {/* Buy Now Button - links to current product */}
+            <Link
+              href={product.slug ? `/products/${product.slug}` : "/shop"}
+              className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3 bg-white dark:bg-black cursor-pointer active:scale-[98%] border dark:border-[#333333] rounded-lg text-black dark:text-white font-medium transition-all hover:bg-gray-100 dark:hover:bg-[#1a1a1a] hover:shadow-lg"
+              aria-label={`এখনই কিনুন: ${product.name}`}
             >
               <ShoppingCartIcon className="w-5 h-5" />
               <span className="font-bengali">এখনই কিনুন</span>
-            </button>
+            </Link>
 
             {/* Divider */}
             <hr

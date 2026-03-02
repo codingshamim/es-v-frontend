@@ -22,6 +22,11 @@ interface Review {
   rating: number;
   comment: string;
   isVerifiedPurchase: boolean;
+  adminReply?: {
+    text: string;
+    repliedAt: string;
+    repliedBy?: string;
+  };
   createdAt: string;
 }
 
@@ -79,6 +84,9 @@ export default function AdminReviewsPage() {
   });
   const [deleteTarget, setDeleteTarget] = useState<Review | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [replyTargetId, setReplyTargetId] = useState<string | null>(null);
+  const [replyDraft, setReplyDraft] = useState("");
+  const [replySaving, setReplySaving] = useState(false);
 
   const limit = 20;
 
@@ -139,6 +147,40 @@ export default function AdminReviewsPage() {
     }
   };
 
+  const openReply = (review: Review) => {
+    setReplyTargetId(review._id);
+    setReplyDraft(review.adminReply?.text ?? "");
+  };
+
+  const closeReply = () => {
+    setReplyTargetId(null);
+    setReplyDraft("");
+  };
+
+  const handleSaveReply = async () => {
+    if (!replyTargetId) return;
+    setReplySaving(true);
+    try {
+      const res = await fetch(`/api/admin/reviews/${replyTargetId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adminReply: replyDraft }),
+      });
+      if (!res.ok) throw new Error("Failed to save reply");
+      const json = await res.json();
+      if (json.data) {
+        setReviews((prev) =>
+          prev.map((r) => (r._id === replyTargetId ? { ...r, adminReply: json.data.adminReply } : r)),
+        );
+      }
+      closeReply();
+    } catch {
+      /* silently fail */
+    } finally {
+      setReplySaving(false);
+    }
+  };
+
   function formatDate(dateStr: string) {
     return new Date(dateStr).toLocaleDateString("en-US", {
       year: "numeric",
@@ -161,7 +203,7 @@ export default function AdminReviewsPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] p-5">
+        <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 p-5">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Average Rating</p>
@@ -178,7 +220,7 @@ export default function AdminReviewsPage() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] p-5">
+        <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 p-5">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Total Reviews</p>
@@ -194,7 +236,7 @@ export default function AdminReviewsPage() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] p-5">
+        <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 p-5">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Positive Reviews</p>
@@ -211,7 +253,7 @@ export default function AdminReviewsPage() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] p-5">
+        <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 p-5">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Negative Reviews</p>
@@ -230,7 +272,7 @@ export default function AdminReviewsPage() {
       </div>
 
       {/* Rating Filter */}
-      <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] p-4">
+      <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 p-4">
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-sm font-medium text-gray-500 dark:text-gray-400 mr-2">
             Filter by rating:
@@ -241,8 +283,8 @@ export default function AdminReviewsPage() {
               onClick={() => setRatingFilter(filter.value)}
               className={`px-3.5 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 ratingFilter === filter.value
-                  ? "bg-teal-600 text-white"
-                  : "bg-gray-100 dark:bg-[#1a1a1a] text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#222]"
+                  ? "bg-white text-black dark:bg-white dark:text-black"
+                  : "bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10"
               }`}
             >
               {filter.label}
@@ -254,10 +296,10 @@ export default function AdminReviewsPage() {
       {/* Reviews List */}
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <Spinner size="lg" className="text-teal-500" />
+          <Spinner size="lg" className="text-white dark:text-white" />
         </div>
       ) : reviews.length === 0 ? (
-        <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] p-12 text-center">
+        <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 p-12 text-center">
           <p className="text-gray-500 dark:text-gray-400">No reviews found.</p>
         </div>
       ) : (
@@ -265,12 +307,12 @@ export default function AdminReviewsPage() {
           {reviews.map((review) => (
             <div
               key={review._id}
-              className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] p-5 hover:border-gray-300 dark:hover:border-[#2a2a2a] transition-colors"
+              className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 p-5 hover:border-gray-300 dark:hover:border-white/20 transition-colors"
             >
               <div className="flex items-start gap-4">
                 {/* Avatar */}
-                <div className="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center shrink-0">
-                  <span className="text-white font-semibold text-sm">
+                <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-white/20 flex items-center justify-center shrink-0">
+                  <span className="text-gray-700 dark:text-white font-semibold text-sm">
                     {review.user?.name?.charAt(0)?.toUpperCase() || "?"}
                   </span>
                 </div>
@@ -291,7 +333,7 @@ export default function AdminReviewsPage() {
 
                   <Link
                     href={`/admin/products/${review.product?._id}/edit`}
-                    className="inline-block text-sm text-teal-500 hover:text-teal-400 transition-colors mt-1"
+                    className="inline-block text-sm text-white dark:text-white hover:opacity-80 transition-colors mt-1"
                   >
                     {review.product?.name || "Unknown Product"}
                   </Link>
@@ -300,6 +342,63 @@ export default function AdminReviewsPage() {
                     <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">
                       {review.comment}
                     </p>
+                  )}
+
+                  {review.adminReply?.text && (
+                    <div className="mt-3 pl-3 border-l-2 border-white/30 dark:border-white/20 bg-white/5 dark:bg-white/5 rounded-r-lg py-2 pr-3">
+                      <p className="text-xs font-semibold text-gray-700 dark:text-white mb-1">
+                        Admin reply
+                      </p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                        {review.adminReply.text}
+                      </p>
+                      <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">
+                        {review.adminReply.repliedAt
+                          ? formatDate(review.adminReply.repliedAt)
+                          : ""}
+                      </p>
+                    </div>
+                  )}
+
+                  {replyTargetId === review._id ? (
+                    <div className="mt-3 space-y-2">
+                      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400">
+                        Admin reply
+                      </label>
+                      <textarea
+                        value={replyDraft}
+                        onChange={(e) => setReplyDraft(e.target.value)}
+                        placeholder="Write your reply to this review..."
+                        rows={3}
+                        className="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-white/50 dark:focus:ring-white/50 focus:border-transparent resize-none"
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={handleSaveReply}
+                          disabled={replySaving}
+                          className="px-3 py-1.5 text-sm font-medium rounded-lg bg-white text-black hover:bg-gray-100 dark:bg-white dark:text-black dark:hover:bg-gray-200 border border-gray-200 dark:border-white/20 disabled:opacity-50 transition-colors"
+                        >
+                          {replySaving ? "Saving..." : "Save reply"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={closeReply}
+                          disabled={replySaving}
+                          className="px-3 py-1.5 text-sm font-medium rounded-lg bg-gray-200 dark:bg-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-white/10 disabled:opacity-50 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => openReply(review)}
+                      className="mt-2 text-xs font-medium text-gray-700 dark:text-white hover:text-white dark:text-white dark:hover:opacity-80 transition-colors"
+                    >
+                      {review.adminReply?.text ? "Edit admin reply" : "Add admin reply"}
+                    </button>
                   )}
 
                   <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
@@ -327,7 +426,7 @@ export default function AdminReviewsPage() {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="px-4 py-2 rounded-xl text-sm font-medium bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#1a1a1a] text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1a1a1a] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 rounded-xl text-sm font-medium bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             Previous
           </button>
@@ -357,8 +456,8 @@ export default function AdminReviewsPage() {
                   onClick={() => setPage(p)}
                   className={`w-10 h-10 rounded-xl text-sm font-medium transition-colors ${
                     page === p
-                      ? "bg-teal-600 text-white"
-                      : "bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#1a1a1a] text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1a1a1a]"
+                      ? "bg-white text-black dark:bg-white dark:text-black"
+                      : "bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5"
                   }`}
                 >
                   {p}
@@ -368,7 +467,7 @@ export default function AdminReviewsPage() {
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            className="px-4 py-2 rounded-xl text-sm font-medium bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#1a1a1a] text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1a1a1a] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 rounded-xl text-sm font-medium bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             Next
           </button>
@@ -378,7 +477,7 @@ export default function AdminReviewsPage() {
       {/* Delete Confirmation Modal */}
       {deleteTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] p-6 w-full max-w-md mx-4 shadow-2xl">
+          <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-md mx-4 shadow-2xl">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Delete Review
@@ -409,7 +508,7 @@ export default function AdminReviewsPage() {
             <div className="flex items-center gap-3 justify-end">
               <button
                 onClick={() => setDeleteTarget(null)}
-                className="px-4 py-2.5 rounded-xl text-sm font-medium bg-gray-100 dark:bg-[#1a1a1a] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#222] transition-colors"
+                className="px-4 py-2.5 rounded-xl text-sm font-medium bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
               >
                 Cancel
               </button>

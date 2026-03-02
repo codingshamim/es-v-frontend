@@ -205,7 +205,7 @@ export default function CategoriesPage() {
         ].map((stat) => (
           <div
             key={stat.label}
-            className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] p-5"
+            className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 p-5"
           >
             <p className="text-sm text-gray-500 dark:text-gray-400">
               {stat.label}
@@ -224,7 +224,7 @@ export default function CategoriesPage() {
         </h2>
         <button
           onClick={openCreateModal}
-          className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+          className="inline-flex items-center gap-2 rounded-xl bg-white text-black px-4 py-2.5 text-sm font-medium hover:bg-gray-100 dark:bg-white dark:text-black dark:hover:bg-gray-200 border border-gray-200 dark:border-white/20 transition-colors"
         >
           <PlusIcon className="h-4 w-4" />
           Add Category
@@ -233,7 +233,7 @@ export default function CategoriesPage() {
 
       {/* Categories Grid */}
       {categoryList.length === 0 ? (
-        <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] p-12 text-center">
+        <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 p-12 text-center">
           <PhotoIcon className="h-12 w-12 mx-auto text-gray-400 dark:text-gray-600 mb-3" />
           <p className="text-gray-500 dark:text-gray-400">
             No categories yet. Create your first category.
@@ -244,7 +244,7 @@ export default function CategoriesPage() {
           {categoryList.map((cat) => (
             <div
               key={cat._id}
-              className="group relative bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] overflow-hidden"
+              className="group relative bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden"
             >
               {/* Image */}
               <div className="relative aspect-video bg-gray-100 dark:bg-[#0a0a0a]">
@@ -310,9 +310,9 @@ export default function CategoriesPage() {
       {/* Create/Edit Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
             {/* Modal header */}
-            <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-[#1a1a1a]">
+            <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-white/10">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 {editingId ? "Edit Category" : "Create Category"}
               </h3>
@@ -339,7 +339,7 @@ export default function CategoriesPage() {
                     setForm((prev) => ({ ...prev, name: e.target.value }))
                   }
                   placeholder="Category name"
-                  className="w-full rounded-xl border border-gray-300 dark:border-[#222] bg-white dark:bg-[#0a0a0a] px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors"
+                  className="w-full rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-[#0a0a0a] px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-white/50 focus:ring-1 focus:ring-white/50 dark:focus:border-white/50 dark:focus:ring-white/50 outline-none transition-colors"
                 />
               </div>
 
@@ -352,7 +352,7 @@ export default function CategoriesPage() {
                   type="text"
                   readOnly
                   value={slug}
-                  className="w-full rounded-xl border border-gray-300 dark:border-[#222] bg-gray-50 dark:bg-[#0a0a0a]/50 px-4 py-2.5 text-sm text-gray-500 dark:text-gray-400 font-mono cursor-not-allowed"
+                  className="w-full rounded-xl border border-gray-300 dark:border-white/10 bg-gray-50 dark:bg-[#0a0a0a]/50 px-4 py-2.5 text-sm text-gray-500 dark:text-gray-400 font-mono cursor-not-allowed"
                 />
               </div>
 
@@ -371,7 +371,7 @@ export default function CategoriesPage() {
                     }))
                   }
                   placeholder="Category description"
-                  className="w-full rounded-xl border border-gray-300 dark:border-[#222] bg-white dark:bg-[#0a0a0a] px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors resize-none"
+                  className="w-full rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-[#0a0a0a] px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-white/50 focus:ring-1 focus:ring-white/50 dark:focus:border-white/50 dark:focus:ring-white/50 outline-none transition-colors resize-none"
                 />
               </div>
 
@@ -381,7 +381,7 @@ export default function CategoriesPage() {
                   Image
                 </label>
                 {imagePreview ? (
-                  <div className="relative aspect-video rounded-xl overflow-hidden border border-gray-200 dark:border-[#222] mb-2">
+                  <div className="relative aspect-video rounded-xl overflow-hidden border border-gray-200 dark:border-white/10 mb-2">
                     <Image
                       src={imagePreview}
                       alt="Preview"
@@ -400,7 +400,7 @@ export default function CategoriesPage() {
                     </button>
                   </div>
                 ) : (
-                  <label className="flex flex-col items-center justify-center aspect-video rounded-xl border-2 border-dashed border-gray-300 dark:border-[#222] cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 transition-colors">
+                  <label className="flex flex-col items-center justify-center aspect-video rounded-xl border-2 border-dashed border-gray-300 dark:border-white/10 cursor-pointer hover:border-white/30 dark:hover:border-white/30 transition-colors">
                     {uploading ? (
                       <Spinner size="md" />
                     ) : (
@@ -437,12 +437,12 @@ export default function CategoriesPage() {
                       }))
                     }
                     className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${
-                      form.isActive ? "bg-blue-600" : "bg-gray-300 dark:bg-gray-700"
+                      form.isActive ? "bg-white dark:bg-white" : "bg-gray-300 dark:bg-gray-700"
                     }`}
                   >
                     <span
-                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ${
-                        form.isActive ? "translate-x-5" : "translate-x-0"
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full shadow ring-0 transition duration-200 ${
+                        form.isActive ? "translate-x-5 bg-black dark:bg-black" : "translate-x-0 bg-white"
                       }`}
                     />
                   </button>
@@ -465,7 +465,7 @@ export default function CategoriesPage() {
                         sortOrder: parseInt(e.target.value) || 0,
                       }))
                     }
-                    className="w-full rounded-xl border border-gray-300 dark:border-[#222] bg-white dark:bg-[#0a0a0a] px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors"
+                    className="w-full rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-[#0a0a0a] px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:border-white/50 focus:ring-1 focus:ring-white/50 dark:focus:border-white/50 dark:focus:ring-white/50 outline-none transition-colors"
                   />
                 </div>
               </div>
@@ -496,7 +496,7 @@ export default function CategoriesPage() {
       {/* Delete Confirmation */}
       {deleteId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] w-full max-w-sm mx-4 p-6">
+          <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 w-full max-w-sm mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               Delete Category
             </h3>

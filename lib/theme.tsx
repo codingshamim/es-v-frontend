@@ -38,24 +38,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
 
     setTheme(initialTheme);
-    // Apply theme to HTML element
-    if (initialTheme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+    document.documentElement.classList.toggle("dark", initialTheme === "dark");
   }, []);
 
   const toggleTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
-    // Apply theme to HTML element
-    if (newTheme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+    // Apply theme to HTML - use classList.toggle so React doesn't overwrite (html has no className from layout)
+    document.documentElement.classList.toggle("dark", newTheme === "dark");
   };
 
   // Always provide the context, even during SSR/hydration

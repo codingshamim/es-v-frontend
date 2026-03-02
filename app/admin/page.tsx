@@ -87,7 +87,7 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <Spinner size="lg" className="text-teal-500" />
+        <Spinner size="lg" className="text-white dark:text-white" />
       </div>
     );
   }
@@ -103,7 +103,7 @@ export default function AdminDashboard() {
         <p className="text-gray-500 text-sm">{error || "Failed to load dashboard"}</p>
         <button
           onClick={() => window.location.reload()}
-          className="px-4 py-2 text-sm font-medium rounded-xl bg-teal-500 text-white hover:bg-teal-600 transition-colors"
+          className="px-4 py-2 text-sm font-medium rounded-xl bg-white text-black border border-gray-200 dark:border-white/20 hover:bg-gray-100 dark:bg-white dark:text-black dark:hover:bg-gray-200 transition-colors"
         >
           Retry
         </button>
@@ -140,11 +140,11 @@ export default function AdminDashboard() {
           title="Total Orders"
           value={(stats.totalOrders ?? 0).toLocaleString()}
           icon={
-            <svg className="w-6 h-6 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-gray-700 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
             </svg>
           }
-          iconBg="bg-teal-500/10"
+          iconBg="bg-white/10 dark:bg-white/10"
           change={`${stats.monthlyOrders ?? 0} this month`}
           changeType="neutral"
         />
@@ -177,7 +177,7 @@ export default function AdminDashboard() {
       {/* Chart & Top Products */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         {/* Sales Overview Chart */}
-        <div className="xl:col-span-2 bg-white dark:bg-[#111111] rounded-2xl p-5 border border-gray-200 dark:border-[#1a1a1a]">
+        <div className="xl:col-span-2 bg-white dark:bg-[#0a0a0a] rounded-2xl p-5 border border-gray-200 dark:border-white/10">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-black dark:text-white">Sales Overview</h2>
             <span className="text-xs text-gray-500">Last 7 days</span>
@@ -192,7 +192,7 @@ export default function AdminDashboard() {
                   </span>
                   <div className="w-full flex justify-center" style={{ height: "140px" }}>
                     <div
-                      className="w-full max-w-[40px] rounded-t-lg bg-teal-500/80 hover:bg-teal-500 transition-colors self-end"
+                      className="w-full max-w-[40px] rounded-t-lg bg-white/80 dark:bg-white/80 hover:bg-white dark:hover:bg-white transition-colors self-end"
                       style={{ height: `${Math.max(height, 4)}%` }}
                       title={`${bar.day}: ${formatBDT(bar.total)}`}
                     />
@@ -205,12 +205,12 @@ export default function AdminDashboard() {
         </div>
 
         {/* Top Products */}
-        <div className="bg-white dark:bg-[#111111] rounded-2xl p-5 border border-gray-200 dark:border-[#1a1a1a]">
+        <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl p-5 border border-gray-200 dark:border-white/10">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-black dark:text-white">Top Products</h2>
             <Link
               href="/admin/products"
-              className="text-xs text-teal-500 hover:text-teal-400 transition-colors"
+              className="text-xs text-gray-700 dark:text-white hover:opacity-80 transition-colors"
             >
               View All
             </Link>
@@ -218,7 +218,7 @@ export default function AdminDashboard() {
           <div className="space-y-4">
             {topProducts.slice(0, 5).map((product) => (
               <div key={product._id} className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl overflow-hidden bg-gray-100 dark:bg-[#1a1a1a] shrink-0">
+                <div className="w-10 h-10 rounded-xl overflow-hidden bg-gray-100 dark:bg-white/5 shrink-0">
                   {product.image ? (
                     <Image
                       src={product.image}
@@ -254,12 +254,12 @@ export default function AdminDashboard() {
       </div>
 
       {/* Recent Orders */}
-      <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a]">
+      <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10">
         <div className="flex items-center justify-between p-5 pb-0">
           <h2 className="text-lg font-semibold text-black dark:text-white">Recent Orders</h2>
           <Link
             href="/admin/orders"
-            className="text-xs text-teal-500 hover:text-teal-400 transition-colors"
+            className="text-xs text-gray-700 dark:text-white hover:opacity-80 transition-colors"
           >
             View All
           </Link>
@@ -267,7 +267,7 @@ export default function AdminDashboard() {
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="border-b border-gray-200 dark:border-[#1a1a1a]">
+              <tr className="border-b border-gray-200 dark:border-white/10">
                 <th className="px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Order ID
                 </th>
@@ -288,11 +288,11 @@ export default function AdminDashboard() {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-[#1a1a1a]">
+            <tbody className="divide-y divide-gray-200 dark:divide-white/10">
               {recentOrders.map((order) => (
                 <tr
                   key={order._id}
-                  className="hover:bg-gray-50 dark:hover:bg-[#1a1a1a]/50 transition-colors"
+                  className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
                 >
                   <td className="px-5 py-3.5 text-sm font-medium text-black dark:text-white whitespace-nowrap">
                     #{order.orderId}
@@ -318,7 +318,7 @@ export default function AdminDashboard() {
                   <td className="px-5 py-3.5 text-right whitespace-nowrap">
                     <Link
                       href={`/admin/orders/${order._id}`}
-                      className="text-xs font-medium text-teal-500 hover:text-teal-400 transition-colors"
+                      className="text-xs font-medium text-gray-700 dark:text-white hover:opacity-80 transition-colors"
                     >
                       View
                     </Link>

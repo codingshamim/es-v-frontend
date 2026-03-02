@@ -18,7 +18,7 @@ export default function StatsCard({
   changeType = "up",
 }: StatsCardProps) {
   return (
-    <div className="bg-white dark:bg-[#111111] rounded-2xl p-5 border border-gray-200 dark:border-[#1a1a1a] transition-all duration-300 hover:-translate-y-0.5">
+    <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl p-5 border border-gray-200 dark:border-white/10 transition-all duration-300 hover:-translate-y-0.5">
       <div className="flex items-center justify-between mb-4">
         <div className={`w-12 h-12 rounded-xl ${iconBg} flex items-center justify-center`}>
           {icon}

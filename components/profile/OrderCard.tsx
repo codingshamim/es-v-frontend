@@ -9,22 +9,44 @@ interface OrderItem {
   image: string;
 }
 
+type OrderStatusDisplay = "completed" | "pending" | "cancelled" | "processing" | "shipped" | "confirmed";
+
 interface OrderCardProps {
   orderId: string;
   date: string;
-  status: "completed" | "pending";
+  status: OrderStatusDisplay;
   items: OrderItem[];
   total: string;
 }
 
-const statusConfig = {
+const statusConfig: Record<string, { label: string; className: string }> = {
+  delivered: {
+    label: "সম্পন্ন",
+    className: "bg-accent-green/10 text-accent-green",
+  },
   completed: {
     label: "সম্পন্ন",
     className: "bg-accent-green/10 text-accent-green",
   },
   pending: {
     label: "প্রক্রিয়াধীন",
+    className: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+  },
+  confirmed: {
+    label: "কনফার্মড",
     className: "bg-accent-blue/10 text-accent-blue",
+  },
+  processing: {
+    label: "প্রসেসিং",
+    className: "bg-accent-blue/10 text-accent-blue",
+  },
+  shipped: {
+    label: "শিপড",
+    className: "bg-accent-teal/10 text-accent-teal",
+  },
+  cancelled: {
+    label: "বাতিল",
+    className: "bg-red-500/10 text-red-500",
   },
 };
 
@@ -35,7 +57,8 @@ export function OrderCard({
   items,
   total,
 }: OrderCardProps) {
-  const config = statusConfig[status];
+  const normalizedStatus = status === "delivered" ? "delivered" : status === "completed" ? "completed" : status;
+  const config = statusConfig[normalizedStatus] ?? statusConfig.pending;
 
   return (
     <div className="bg-gray-50 dark:bg-[#0a0a0a] rounded-2xl p-5 sm:p-6 border border-gray-200 dark:border-[#1a1a1a] transition-all duration-300 hover:-translate-y-0.5">
@@ -57,13 +80,13 @@ export function OrderCard({
         </div>
         <div className="flex items-center gap-2">
           <Link
-            href={`/tracking?order=${orderId}`}
+            href={`/order-confirmed?orderId=${orderId}`}
             className="px-4 py-2 border border-gray-200 dark:border-[#222222] rounded-xl text-sm text-black dark:text-white hover:bg-gray-100 dark:hover:bg-[#111111] transition-colors font-bengali"
           >
             ট্র্যাক করুন
           </Link>
           <Link
-            href={`/orders/${orderId}`}
+            href={`/order-confirmed?orderId=${orderId}`}
             className="px-4 py-2 bg-white dark:bg-white border border-gray-200 dark:border-white text-black rounded-xl text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-100 transition-colors font-bengali"
           >
             বিস্তারিত

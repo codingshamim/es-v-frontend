@@ -40,6 +40,41 @@ interface Settings {
   notifications: NotificationSettings;
 }
 
+function normalizeSettings(d: {
+  store?: Partial<StoreSettings>;
+  shipping?: Partial<ShippingSettings>;
+  payment?: Partial<PaymentSettings>;
+  notifications?: Partial<NotificationSettings>;
+}): Settings {
+  return {
+    store: {
+      storeName: String(d.store?.storeName ?? ""),
+      storeEmail: String(d.store?.storeEmail ?? ""),
+      storePhone: String(d.store?.storePhone ?? ""),
+      storeAddress: String(d.store?.storeAddress ?? ""),
+    },
+    shipping: {
+      dhakaCharge: Number(d.shipping?.dhakaCharge ?? 60),
+      outsideDhakaCharge: Number(d.shipping?.outsideDhakaCharge ?? 120),
+      freeShippingMin: Number(d.shipping?.freeShippingMin ?? 0),
+    },
+    payment: {
+      codEnabled: Boolean(d.payment?.codEnabled ?? true),
+      bkashEnabled: Boolean(d.payment?.bkashEnabled ?? false),
+      bkashNumber: String(d.payment?.bkashNumber ?? ""),
+      nagadEnabled: Boolean(d.payment?.nagadEnabled ?? false),
+      nagadNumber: String(d.payment?.nagadNumber ?? ""),
+      rocketEnabled: Boolean(d.payment?.rocketEnabled ?? false),
+      rocketNumber: String(d.payment?.rocketNumber ?? ""),
+    },
+    notifications: {
+      orderNotification: Boolean(d.notifications?.orderNotification ?? true),
+      lowStockNotification: Boolean(d.notifications?.lowStockNotification ?? true),
+      newReviewNotification: Boolean(d.notifications?.newReviewNotification ?? false),
+    },
+  };
+}
+
 const defaultSettings: Settings = {
   store: {
     storeName: "",
@@ -83,7 +118,7 @@ function Toggle({
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
       />
-      <div className="w-11 h-6 bg-gray-300 dark:bg-gray-600 peer-checked:bg-accent-teal rounded-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full" />
+      <div className="w-11 h-6 bg-gray-300 dark:bg-gray-600 peer-checked:bg-white dark:peer-checked:bg-white rounded-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:bg-black dark:peer-checked:after:bg-black" />
     </label>
   );
 }
@@ -100,13 +135,7 @@ export default function SettingsPage() {
         const res = await fetch("/api/admin/settings");
         const json = await res.json();
         if (res.ok && json.success && json.data) {
-          const d = json.data;
-          setSettings((prev) => ({
-            store: { ...prev.store, ...d.store },
-            shipping: { ...prev.shipping, ...d.shipping },
-            payment: { ...prev.payment, ...d.payment },
-            notifications: { ...prev.notifications, ...d.notifications },
-          }));
+          setSettings(normalizeSettings(json.data));
         }
       } catch {
         console.error("Failed to fetch settings");
@@ -131,7 +160,9 @@ export default function SettingsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(settings),
       });
-      if (res.ok) {
+      const json = await res.json();
+      if (res.ok && json.success && json.data) {
+        setSettings(normalizeSettings(json.data));
         setToast("Settings saved successfully!");
       } else {
         setToast("Failed to save settings");
@@ -196,7 +227,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Store Settings */}
-      <div className="bg-white dark:bg-[#111111] rounded-2xl p-6">
+      <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl p-6">
         <h2 className="text-lg font-semibold text-black dark:text-white mb-4">
           Store Settings
         </h2>
@@ -210,7 +241,7 @@ export default function SettingsPage() {
               value={settings.store.storeName}
               onChange={(e) => updateStore("storeName", e.target.value)}
               placeholder="Your store name"
-              className="w-full bg-gray-100 dark:bg-[#1a1a1a] border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-accent-teal transition-all"
+              className="w-full bg-gray-100 dark:bg-white/5 border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-white/50 dark:focus:ring-white/50 transition-all"
             />
           </div>
           <div>
@@ -222,7 +253,7 @@ export default function SettingsPage() {
               value={settings.store.storeEmail}
               onChange={(e) => updateStore("storeEmail", e.target.value)}
               placeholder="store@example.com"
-              className="w-full bg-gray-100 dark:bg-[#1a1a1a] border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-accent-teal transition-all"
+              className="w-full bg-gray-100 dark:bg-white/5 border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-white/50 dark:focus:ring-white/50 transition-all"
             />
           </div>
           <div>
@@ -234,7 +265,7 @@ export default function SettingsPage() {
               value={settings.store.storePhone}
               onChange={(e) => updateStore("storePhone", e.target.value)}
               placeholder="+880 1XXX-XXXXXX"
-              className="w-full bg-gray-100 dark:bg-[#1a1a1a] border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-accent-teal transition-all"
+              className="w-full bg-gray-100 dark:bg-white/5 border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-white/50 dark:focus:ring-white/50 transition-all"
             />
           </div>
           <div>
@@ -246,14 +277,14 @@ export default function SettingsPage() {
               value={settings.store.storeAddress}
               onChange={(e) => updateStore("storeAddress", e.target.value)}
               placeholder="Full store address"
-              className="w-full bg-gray-100 dark:bg-[#1a1a1a] border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-accent-teal transition-all resize-none"
+              className="w-full bg-gray-100 dark:bg-white/5 border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-white/50 dark:focus:ring-white/50 transition-all resize-none"
             />
           </div>
         </div>
       </div>
 
       {/* Shipping Settings */}
-      <div className="bg-white dark:bg-[#111111] rounded-2xl p-6">
+      <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl p-6">
         <h2 className="text-lg font-semibold text-black dark:text-white mb-4">
           Shipping Settings
         </h2>
@@ -269,7 +300,7 @@ export default function SettingsPage() {
               onChange={(e) =>
                 updateShipping("dhakaCharge", parseInt(e.target.value) || 0)
               }
-              className="w-full bg-gray-100 dark:bg-[#1a1a1a] border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-accent-teal transition-all"
+              className="w-full bg-gray-100 dark:bg-white/5 border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-white/50 dark:focus:ring-white/50 transition-all"
             />
           </div>
           <div>
@@ -286,7 +317,7 @@ export default function SettingsPage() {
                   parseInt(e.target.value) || 0,
                 )
               }
-              className="w-full bg-gray-100 dark:bg-[#1a1a1a] border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-accent-teal transition-all"
+              className="w-full bg-gray-100 dark:bg-white/5 border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-white/50 dark:focus:ring-white/50 transition-all"
             />
           </div>
           <div>
@@ -303,7 +334,7 @@ export default function SettingsPage() {
                   parseInt(e.target.value) || 0,
                 )
               }
-              className="w-full bg-gray-100 dark:bg-[#1a1a1a] border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-accent-teal transition-all"
+              className="w-full bg-gray-100 dark:bg-white/5 border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-white/50 dark:focus:ring-white/50 transition-all"
             />
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
               Set to 0 to disable free shipping
@@ -313,7 +344,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Payment Methods */}
-      <div className="bg-white dark:bg-[#111111] rounded-2xl p-6">
+      <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl p-6">
         <h2 className="text-lg font-semibold text-black dark:text-white mb-4">
           Payment Methods
         </h2>
@@ -334,7 +365,7 @@ export default function SettingsPage() {
             />
           </div>
 
-          <div className="border-t border-gray-100 dark:border-[#1a1a1a]" />
+          <div className="border-t border-gray-100 dark:border-white/10" />
 
           {/* bKash */}
           <div className="space-y-3">
@@ -360,12 +391,12 @@ export default function SettingsPage() {
                   updatePayment("bkashNumber", e.target.value)
                 }
                 placeholder="bKash number (e.g. 01XXXXXXXXX)"
-                className="w-full md:w-1/2 bg-gray-100 dark:bg-[#1a1a1a] border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-accent-teal transition-all"
+                className="w-full md:w-1/2 bg-gray-100 dark:bg-white/5 border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-white/50 dark:focus:ring-white/50 transition-all"
               />
             )}
           </div>
 
-          <div className="border-t border-gray-100 dark:border-[#1a1a1a]" />
+          <div className="border-t border-gray-100 dark:border-white/10" />
 
           {/* Nagad */}
           <div className="space-y-3">
@@ -391,12 +422,12 @@ export default function SettingsPage() {
                   updatePayment("nagadNumber", e.target.value)
                 }
                 placeholder="Nagad number (e.g. 01XXXXXXXXX)"
-                className="w-full md:w-1/2 bg-gray-100 dark:bg-[#1a1a1a] border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-accent-teal transition-all"
+                className="w-full md:w-1/2 bg-gray-100 dark:bg-white/5 border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-white/50 dark:focus:ring-white/50 transition-all"
               />
             )}
           </div>
 
-          <div className="border-t border-gray-100 dark:border-[#1a1a1a]" />
+          <div className="border-t border-gray-100 dark:border-white/10" />
 
           {/* Rocket */}
           <div className="space-y-3">
@@ -422,7 +453,7 @@ export default function SettingsPage() {
                   updatePayment("rocketNumber", e.target.value)
                 }
                 placeholder="Rocket number (e.g. 01XXXXXXXXX)"
-                className="w-full md:w-1/2 bg-gray-100 dark:bg-[#1a1a1a] border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-accent-teal transition-all"
+                className="w-full md:w-1/2 bg-gray-100 dark:bg-white/5 border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-white/50 dark:focus:ring-white/50 transition-all"
               />
             )}
           </div>
@@ -430,7 +461,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Notifications */}
-      <div className="bg-white dark:bg-[#111111] rounded-2xl p-6">
+      <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl p-6">
         <h2 className="text-lg font-semibold text-black dark:text-white mb-4">
           Notifications
         </h2>
@@ -450,7 +481,7 @@ export default function SettingsPage() {
             />
           </div>
 
-          <div className="border-t border-gray-100 dark:border-[#1a1a1a]" />
+          <div className="border-t border-gray-100 dark:border-white/10" />
 
           <div className="flex items-center justify-between">
             <div>
@@ -469,7 +500,7 @@ export default function SettingsPage() {
             />
           </div>
 
-          <div className="border-t border-gray-100 dark:border-[#1a1a1a]" />
+          <div className="border-t border-gray-100 dark:border-white/10" />
 
           <div className="flex items-center justify-between">
             <div>
@@ -495,7 +526,7 @@ export default function SettingsPage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="inline-flex items-center gap-2 bg-accent-teal text-white rounded-xl px-8 py-3 text-sm font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          className="inline-flex items-center gap-2 bg-white text-black rounded-xl px-8 py-3 text-sm font-medium hover:bg-gray-100 dark:bg-white dark:text-black dark:hover:bg-gray-200 border border-gray-200 dark:border-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         >
           {saving && <Spinner size="sm" />}
           {saving ? "Saving..." : "Save Settings"}
@@ -505,7 +536,7 @@ export default function SettingsPage() {
       {/* Toast */}
       {toast && (
         <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-4 fade-in duration-300">
-          <div className="bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-[#2a2a2a] rounded-xl px-5 py-3 shadow-lg flex items-center gap-3">
+          <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-5 py-3 shadow-lg flex items-center gap-3">
             <div
               className={`w-2 h-2 rounded-full ${toast.includes("success") ? "bg-green-500" : "bg-red-500"}`}
             />

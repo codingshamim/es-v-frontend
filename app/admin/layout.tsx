@@ -37,7 +37,7 @@ export default function AdminLayout({
 
   return (
     <AdminGuard>
-      <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-[#0a0a0a]">
+      <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-[#000000]">
         <AdminSidebar
           open={sidebarOpen}
           onClose={() => setSidebarOpen(false)}

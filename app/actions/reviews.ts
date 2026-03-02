@@ -1,6 +1,7 @@
 "use server";
 
 import mongoose from "mongoose";
+import { emitToAdmin } from "@/lib/socket-server";
 import { auth } from "@/lib/auth/auth";
 import { connectDB } from "@/lib/db/connectDB";
 import Review from "@/lib/models/Review";
@@ -98,9 +99,15 @@ export async function addReview(payload: ReviewPayload): Promise<ReviewResult> {
       allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length;
 
     await Product.findByIdAndUpdate(productObjectId, {
-      "ratings.average": Math.round(avgRating * 10) / 10,
-      "ratings.count": allReviews.length,
+      $set: {
+        ratings: {
+          average: Math.round(avgRating * 10) / 10,
+          count: allReviews.length,
+        },
+      },
     });
+
+    emitToAdmin("notification", { type: "review" });
 
     return {
       success: true,

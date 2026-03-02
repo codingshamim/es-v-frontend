@@ -167,7 +167,7 @@ export default function AdminProductsPage() {
         </div>
         <Link
           href="/admin/products/create"
-          className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition-colors"
+          className="inline-flex items-center gap-2 bg-white text-black hover:bg-gray-100 dark:bg-white dark:text-black dark:hover:bg-gray-200 border border-gray-200 dark:border-white/20 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors"
         >
           <PlusIcon className="w-4 h-4" />
           Add Product
@@ -175,19 +175,19 @@ export default function AdminProductsPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] p-4">
+      <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 p-4">
         <div className="flex flex-col sm:flex-row gap-3">
           <input
             type="text"
             placeholder="Search products..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 bg-gray-100 dark:bg-[#1a1a1a] border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-500/40"
+            className="flex-1 bg-gray-100 dark:bg-white/5 border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 dark:focus:ring-white/50"
           />
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="bg-gray-100 dark:bg-[#1a1a1a] border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500/40 min-w-[160px]"
+            className="bg-gray-100 dark:bg-white/5 border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-white/50 dark:focus:ring-white/50 min-w-[160px]"
           >
             <option value="">All Categories</option>
             {CATEGORIES.map((c) => (
@@ -199,7 +199,7 @@ export default function AdminProductsPage() {
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            className="bg-gray-100 dark:bg-[#1a1a1a] border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500/40 min-w-[160px]"
+            className="bg-gray-100 dark:bg-white/5 border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-white/50 dark:focus:ring-white/50 min-w-[160px]"
           >
             {STATUSES.map((s) => (
               <option key={s} value={s}>
@@ -213,10 +213,10 @@ export default function AdminProductsPage() {
       {/* Products Grid */}
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <Spinner size="lg" className="text-teal-500" />
+          <Spinner size="lg" className="text-white dark:text-white" />
         </div>
       ) : !products?.length ? (
-        <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] p-12 text-center">
+        <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 p-12 text-center">
           <p className="text-gray-500 dark:text-gray-400">No products found.</p>
         </div>
       ) : (
@@ -224,7 +224,7 @@ export default function AdminProductsPage() {
           {products.map((product) => (
             <div
               key={product._id}
-              className="group bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] overflow-hidden hover:border-gray-300 dark:hover:border-[#2a2a2a] transition-colors"
+              className="group bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden hover:border-gray-300 dark:hover:border-white/20 transition-colors"
             >
               {/* Product Image */}
               <div className="relative aspect-square bg-gray-100 dark:bg-[#0a0a0a]">
@@ -250,7 +250,7 @@ export default function AdminProductsPage() {
                     onClick={() =>
                       router.push(`/admin/products/${product._id}/edit`)
                     }
-                    className="bg-white dark:bg-[#1a1a1a] text-gray-900 dark:text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-[#222] transition-colors"
+                    className="bg-white dark:bg-white/5 text-gray-900 dark:text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
                   >
                     Edit
                   </button>
@@ -279,7 +279,7 @@ export default function AdminProductsPage() {
                 <div className="flex items-center gap-2">
                   {product.salePrice ? (
                     <>
-                      <span className="text-sm font-bold text-teal-500">
+                      <span className="text-sm font-bold text-gray-900 dark:text-white">
                         ${product.salePrice.toFixed(2)}
                       </span>
                       <span className="text-xs text-gray-400 line-through">
@@ -320,7 +320,7 @@ export default function AdminProductsPage() {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="px-4 py-2 rounded-xl text-sm font-medium bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#1a1a1a] text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1a1a1a] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 rounded-xl text-sm font-medium bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             Previous
           </button>
@@ -350,8 +350,8 @@ export default function AdminProductsPage() {
                   onClick={() => setPage(p)}
                   className={`w-10 h-10 rounded-xl text-sm font-medium transition-colors ${
                     page === p
-                      ? "bg-teal-600 text-white"
-                      : "bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#1a1a1a] text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1a1a1a]"
+                      ? "bg-white text-black dark:bg-white dark:text-black border border-white dark:border-white"
+                      : "bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5"
                   }`}
                 >
                   {p}
@@ -361,7 +361,7 @@ export default function AdminProductsPage() {
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            className="px-4 py-2 rounded-xl text-sm font-medium bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#1a1a1a] text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#1a1a1a] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 rounded-xl text-sm font-medium bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             Next
           </button>
@@ -371,7 +371,7 @@ export default function AdminProductsPage() {
       {/* Delete Confirmation Modal */}
       {deleteTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] p-6 w-full max-w-md mx-4 shadow-2xl">
+          <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-md mx-4 shadow-2xl">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Delete Product
@@ -393,7 +393,7 @@ export default function AdminProductsPage() {
             <div className="flex items-center gap-3 justify-end">
               <button
                 onClick={() => setDeleteTarget(null)}
-                className="px-4 py-2.5 rounded-xl text-sm font-medium bg-gray-100 dark:bg-[#1a1a1a] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#222] transition-colors"
+                className="px-4 py-2.5 rounded-xl text-sm font-medium bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
               >
                 Cancel
               </button>

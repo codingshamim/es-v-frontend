@@ -225,7 +225,7 @@ export default function CouponsPage() {
         ].map((stat) => (
           <div
             key={stat.label}
-            className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] p-5"
+            className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 p-5"
           >
             <p className="text-sm text-gray-500 dark:text-gray-400">
               {stat.label}
@@ -244,7 +244,7 @@ export default function CouponsPage() {
         </h2>
         <button
           onClick={openCreateModal}
-          className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+          className="inline-flex items-center gap-2 rounded-xl bg-white text-black px-4 py-2.5 text-sm font-medium hover:bg-gray-100 dark:bg-white dark:text-black dark:hover:bg-gray-200 border border-gray-200 dark:border-white/20 transition-colors"
         >
           <PlusIcon className="h-4 w-4" />
           Add Coupon
@@ -253,7 +253,7 @@ export default function CouponsPage() {
 
       {/* Coupons Grid */}
       {coupons.length === 0 ? (
-        <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] p-12 text-center">
+        <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 p-12 text-center">
           <TicketIcon className="h-12 w-12 mx-auto text-gray-400 dark:text-gray-600 mb-3" />
           <p className="text-gray-500 dark:text-gray-400">
             No coupons yet. Create your first coupon.
@@ -266,7 +266,7 @@ export default function CouponsPage() {
             return (
               <div
                 key={coupon._id}
-                className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] p-5 space-y-4"
+                className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 p-5 space-y-4"
               >
                 {/* Code & Status */}
                 <div className="flex items-start justify-between gap-2">
@@ -332,7 +332,7 @@ export default function CouponsPage() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-2 pt-2 border-t border-gray-100 dark:border-[#1a1a1a]">
+                <div className="flex items-center gap-2 pt-2 border-t border-gray-100 dark:border-white/10">
                   <button
                     onClick={() => openEditModal(coupon)}
                     className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
@@ -357,9 +357,9 @@ export default function CouponsPage() {
       {/* Create/Edit Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
             {/* Modal header */}
-            <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-[#1a1a1a]">
+            <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-white/10">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 {editingId ? "Edit Coupon" : "Create Coupon"}
               </h3>
@@ -390,7 +390,7 @@ export default function CouponsPage() {
                     }))
                   }
                   placeholder="e.g. SAVE20"
-                  className="w-full rounded-xl border border-gray-300 dark:border-[#222] bg-white dark:bg-[#0a0a0a] px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors font-mono tracking-wider uppercase"
+                  className="w-full rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-[#0a0a0a] px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-white/50 focus:ring-1 focus:ring-white/50 dark:focus:border-white/50 dark:focus:ring-white/50 outline-none transition-colors font-mono tracking-wider uppercase"
                 />
               </div>
 
@@ -405,8 +405,8 @@ export default function CouponsPage() {
                       key={t}
                       className={`flex-1 flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium cursor-pointer transition-colors ${
                         form.type === t
-                          ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-                          : "border-gray-300 dark:border-[#222] text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5"
+                          ? "border-white/50 dark:border-white/30 bg-white/10 dark:bg-white/5 text-gray-900 dark:text-white"
+                          : "border-gray-300 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5"
                       }`}
                     >
                       <input
@@ -444,7 +444,7 @@ export default function CouponsPage() {
                       }))
                     }
                     placeholder="0"
-                    className="w-full rounded-xl border border-gray-300 dark:border-[#222] bg-white dark:bg-[#0a0a0a] px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors"
+                    className="w-full rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-[#0a0a0a] px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-white/50 focus:ring-1 focus:ring-white/50 dark:focus:border-white/50 dark:focus:ring-white/50 outline-none transition-colors"
                   />
                 </div>
                 <div>
@@ -463,7 +463,7 @@ export default function CouponsPage() {
                       }))
                     }
                     placeholder="0"
-                    className="w-full rounded-xl border border-gray-300 dark:border-[#222] bg-white dark:bg-[#0a0a0a] px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors"
+                    className="w-full rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-[#0a0a0a] px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-white/50 focus:ring-1 focus:ring-white/50 dark:focus:border-white/50 dark:focus:ring-white/50 outline-none transition-colors"
                   />
                 </div>
               </div>
@@ -489,7 +489,7 @@ export default function CouponsPage() {
                       }))
                     }
                     placeholder="0"
-                    className="w-full rounded-xl border border-gray-300 dark:border-[#222] bg-white dark:bg-[#0a0a0a] px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors"
+                    className="w-full rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-[#0a0a0a] px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-white/50 focus:ring-1 focus:ring-white/50 dark:focus:border-white/50 dark:focus:ring-white/50 outline-none transition-colors"
                   />
                 </div>
               )}
@@ -514,7 +514,7 @@ export default function CouponsPage() {
                       }))
                     }
                     placeholder="0"
-                    className="w-full rounded-xl border border-gray-300 dark:border-[#222] bg-white dark:bg-[#0a0a0a] px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors"
+                    className="w-full rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-[#0a0a0a] px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-white/50 focus:ring-1 focus:ring-white/50 dark:focus:border-white/50 dark:focus:ring-white/50 outline-none transition-colors"
                   />
                 </div>
                 <div>
@@ -531,7 +531,7 @@ export default function CouponsPage() {
                         expiresAt: e.target.value,
                       }))
                     }
-                    className="w-full rounded-xl border border-gray-300 dark:border-[#222] bg-white dark:bg-[#0a0a0a] px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors"
+                    className="w-full rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-[#0a0a0a] px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:border-white/50 focus:ring-1 focus:ring-white/50 dark:focus:border-white/50 dark:focus:ring-white/50 outline-none transition-colors"
                   />
                 </div>
               </div>
@@ -555,7 +555,7 @@ export default function CouponsPage() {
                     }))
                   }
                   placeholder="Brief description of the coupon"
-                  className="w-full rounded-xl border border-gray-300 dark:border-[#222] bg-white dark:bg-[#0a0a0a] px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-colors resize-none"
+                  className="w-full rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-[#0a0a0a] px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-white/50 focus:ring-1 focus:ring-white/50 dark:focus:border-white/50 dark:focus:ring-white/50 outline-none transition-colors resize-none"
                 />
               </div>
 
@@ -574,13 +574,13 @@ export default function CouponsPage() {
                   }
                   className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${
                     form.isActive
-                      ? "bg-blue-600"
+                      ? "bg-white dark:bg-white"
                       : "bg-gray-300 dark:bg-gray-700"
                   }`}
                 >
                   <span
                     className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ${
-                      form.isActive ? "translate-x-5" : "translate-x-0"
+                      form.isActive ? "translate-x-5 bg-black dark:bg-black" : "translate-x-0 bg-white"
                     }`}
                   />
                 </button>
@@ -615,7 +615,7 @@ export default function CouponsPage() {
       {/* Delete Confirmation */}
       {deleteId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] w-full max-w-sm mx-4 p-6">
+          <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 w-full max-w-sm mx-4 p-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               Delete Coupon
             </h3>

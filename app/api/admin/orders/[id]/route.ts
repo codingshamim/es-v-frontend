@@ -56,9 +56,16 @@ export async function PUT(
         order.payment.verifiedAt = new Date();
       }
     }
+    if (body.transactionId !== undefined) {
+      order.payment.transactionId = String(body.transactionId || "").trim() || undefined;
+    }
+    if (body.senderNumber !== undefined) {
+      order.payment.senderNumber = String(body.senderNumber || "").trim() || undefined;
+    }
 
     await order.save();
-    return Response.json({ success: true, data: order });
+    const out = order.toObject ? order.toObject() : order;
+    return Response.json({ success: true, data: out, order: out });
   } catch (err) {
     console.error("[admin/orders PUT]", err);
     return Response.json({ success: false, message: "Server error" }, { status: 500 });

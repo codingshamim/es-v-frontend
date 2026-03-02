@@ -57,19 +57,19 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
         />
       )}
       <aside
-        className={`fixed lg:relative inset-y-0 left-0 z-50 w-64 bg-white dark:bg-[#111111] border-r border-gray-200 dark:border-[#1a1a1a] transform transition-transform duration-300 flex flex-col ${
+        className={`fixed lg:relative inset-y-0 left-0 z-50 w-64 bg-white dark:bg-[#000000] border-r border-gray-200 dark:border-white/10 transform transition-transform duration-300 flex flex-col ${
           open ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0`}
       >
-        <div className="flex items-center gap-3 px-6 h-16 border-b border-gray-200 dark:border-[#1a1a1a] shrink-0">
-          <div className="w-8 h-8 bg-accent-teal rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">ES</span>
+        <div className="flex items-center gap-3 px-6 h-16 border-b border-gray-200 dark:border-white/10 shrink-0">
+          <div className="w-8 h-8 bg-black dark:bg-white rounded-lg flex items-center justify-center">
+            <span className="text-white dark:text-black font-bold text-sm">ES</span>
           </div>
           <div>
             <h1 className="text-black dark:text-white font-bold text-lg leading-none">
               ES FITT
             </h1>
-            <span className="text-accent-teal text-[10px] uppercase tracking-wider">
+            <span className="text-gray-500 dark:text-gray-400 text-[10px] uppercase tracking-wider">
               Admin Panel
             </span>
           </div>
@@ -85,8 +85,8 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
                 onClick={onClose}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                   active
-                    ? "bg-accent-teal/10 text-accent-teal"
-                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#1a1a1a] hover:text-accent-teal"
+                    ? "bg-white/10 dark:bg-white/10 text-black dark:text-white"
+                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-black dark:hover:text-white"
                 }`}
               >
                 <item.icon className="w-5 h-5" />
@@ -98,7 +98,7 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
             );
           })}
 
-          <div className="pt-4 mt-4 border-t border-gray-200 dark:border-[#1a1a1a]">
+          <div className="pt-4 mt-4 border-t border-gray-200 dark:border-white/10">
             {BOTTOM_NAV.map((item) => {
               const active = isActive(item.href);
               return (
@@ -108,8 +108,8 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
                   onClick={onClose}
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                     active
-                      ? "bg-accent-teal/10 text-accent-teal"
-                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#1a1a1a] hover:text-accent-teal"
+                      ? "bg-white/10 dark:bg-white/10 text-black dark:text-white"
+                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-black dark:hover:text-white"
                   }`}
                 >
                   <item.icon className="w-5 h-5" />
@@ -120,9 +120,9 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
           </div>
         </nav>
 
-        <div className="p-4 border-t border-gray-200 dark:border-[#1a1a1a] shrink-0">
+        <div className="p-4 border-t border-gray-200 dark:border-white/10 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-accent-teal flex items-center justify-center text-white font-semibold">
+            <div className="w-10 h-10 rounded-full bg-black dark:bg-white flex items-center justify-center text-white dark:text-black font-semibold">
               {user?.name?.charAt(0)?.toUpperCase() || "A"}
             </div>
             <div className="flex-1 min-w-0">

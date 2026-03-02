@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Use .dark class on html for theme toggle (not prefers-color-scheme) */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-accent-green: #22c55e;
   --color-accent-blue: #3b82f6;
@@ -29,11 +32,9 @@
   --foreground: #000000;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #000000;
-    --foreground: #ffffff;
-  }
+.dark {
+  --background: #000000;
+  --foreground: #ffffff;
 }
 
 body {

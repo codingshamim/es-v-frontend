@@ -56,6 +56,10 @@ interface ReviewData {
   comment: string;
   images: string[];
   isVerifiedPurchase: boolean;
+  adminReply?: {
+    text: string;
+    repliedAt: string;
+  };
   createdAt: string;
 }
 
@@ -123,33 +127,46 @@ function ReviewCard({ review, index }: { review: ReviewData; index: number }) {
   const timeAgo = getTimeAgo(date);
 
   return (
-    <div className="bg-gray-50 dark:bg-[#111111] rounded-xl p-4 border border-gray-200 dark:border-[#222222]">
-      <div className="flex items-start gap-3">
-        <div className={`w-10 h-10 rounded-full ${bgColor} flex items-center justify-center text-white font-bold shrink-0`}>
+    <article className="group relative overflow-hidden rounded-2xl bg-white dark:bg-[#0d0d0d] p-6 shadow-sm ring-1 ring-gray-200/80 dark:ring-white/[0.06] transition-all hover:shadow-md hover:ring-gray-300/80 dark:hover:ring-white/[0.1]">
+      <div className="flex items-start gap-4">
+        <div className={`relative shrink-0 w-12 h-12 rounded-2xl ${bgColor} flex items-center justify-center text-white font-bold text-lg shadow-inner ring-2 ring-white/20 dark:ring-black/20`}>
           {initial}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between gap-2 mb-1">
-            <div className="flex items-center gap-2">
-              <h4 className="font-medium text-black dark:text-white text-sm">{review.name}</h4>
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h4 className="font-semibold text-black dark:text-white">{review.name}</h4>
               {review.isVerifiedPurchase && (
-                <span className="text-[10px] text-accent-green font-medium bg-accent-green/10 px-1.5 py-0.5 rounded-full">
+                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-accent-green bg-accent-green/15 dark:bg-accent-green/20 px-2 py-1 rounded-lg">
+                  <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
                   ক্রেতা
                 </span>
               )}
             </div>
-            <span className="text-xs text-gray-400 dark:text-[#666666] shrink-0">{timeAgo}</span>
+            <span className="text-xs text-gray-400 dark:text-gray-500 tabular-nums">{timeAgo}</span>
           </div>
-          <div className="mb-2">
-            <StarRating rating={review.rating} />
+          <div className="mb-3">
+            <StarRating rating={review.rating} size="md" />
           </div>
-          <p className="text-sm text-gray-600 dark:text-[#a0a0a0] leading-relaxed">
+          <p className="text-[15px] text-gray-600 dark:text-gray-400 leading-relaxed">
             {review.comment}
           </p>
+          {review.adminReply?.text && (
+            <div className="mt-4 rounded-xl bg-gradient-to-br from-accent-teal/10 to-accent-teal/5 dark:from-accent-teal/15 dark:to-accent-teal/5 p-4 ring-1 ring-accent-teal/20">
+              <p className="text-xs font-semibold text-accent-teal uppercase tracking-wider mb-1.5 font-bengali">
+                স্টোর রিপ্লাই
+              </p>
+              <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-bengali">
+                {review.adminReply.text}
+              </p>
+            </div>
+          )}
           {review.images.length > 0 && (
-            <div className="flex gap-2 mt-3">
+            <div className="flex gap-2 mt-4">
               {review.images.map((img, i) => (
-                <div key={i} className="w-16 h-16 rounded-lg overflow-hidden">
+                <div key={i} className="w-16 h-16 rounded-xl overflow-hidden ring-1 ring-gray-200/60 dark:ring-white/10">
                   <Image src={img} alt="Review" width={64} height={64} className="w-full h-full object-cover" />
                 </div>
               ))}
@@ -157,7 +174,7 @@ function ReviewCard({ review, index }: { review: ReviewData; index: number }) {
           )}
         </div>
       </div>
-    </div>
+    </article>
   );
 }
 
@@ -196,6 +213,7 @@ export default function ProductDetailPage() {
   const [selectedColorName, setSelectedColorName] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [mainImage, setMainImage] = useState("");
+  const [imageLoading, setImageLoading] = useState(false);
   const [validationMsg, setValidationMsg] = useState("");
   const [cartToast, setCartToast] = useState(false);
 
@@ -209,6 +227,8 @@ export default function ProductDetailPage() {
   const [reviewSuccess, setReviewSuccess] = useState("");
   const [reviewPage, setReviewPage] = useState(1);
   const [reviewTotal, setReviewTotal] = useState(0);
+  const [reviewAverage, setReviewAverage] = useState(0);
+  const [canReview, setCanReview] = useState(false);
 
   const fetchProduct = useCallback(async () => {
     try {
@@ -241,6 +261,9 @@ export default function ProductDetailPage() {
             setReviews((prev) => [...prev, ...json.data]);
           }
           setReviewTotal(json.pagination.total);
+          if (json.stats) {
+            setReviewAverage(json.stats.average ?? 0);
+          }
         }
       } catch {
         /* silent */
@@ -251,6 +274,7 @@ export default function ProductDetailPage() {
 
   useEffect(() => {
     if (!slug) return;
+    window.scrollTo(0, 0);
     fetchProduct();
     fetchReviews(1);
   }, [slug, fetchProduct, fetchReviews]);
@@ -270,6 +294,19 @@ export default function ProductDetailPage() {
       })
       .catch(() => {});
   }, [product]);
+
+  useEffect(() => {
+    if (!session || !slug) {
+      setCanReview(false);
+      return;
+    }
+    fetch(`/api/products/${slug}/can-review`)
+      .then((r) => r.json())
+      .then((json) => {
+        setCanReview(json.success && json.canReview === true);
+      })
+      .catch(() => setCanReview(false));
+  }, [session, slug]);
 
   useEffect(() => {
     if (!cartToast) return;
@@ -367,6 +404,7 @@ export default function ProductDetailPage() {
       setReviewSuccess("রিভিউ সফলভাবে যোগ হয়েছে!");
       setReviewRating(0);
       setReviewComment("");
+      setCanReview(false);
       fetchReviews(1);
       setReviewPage(1);
     } else {
@@ -417,7 +455,7 @@ export default function ProductDetailPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12">
               {/* Image Gallery */}
               <div className="relative">
-                <div className="bg-gray-100 dark:bg-[#1a1a1a] rounded-2xl overflow-hidden aspect-square lg:aspect-[4/5]">
+                <div className="relative bg-gray-100 dark:bg-[#1a1a1a] rounded-2xl overflow-hidden aspect-square lg:aspect-[4/5]">
                   <Image
                     src={mainImage}
                     alt={product.name}
@@ -425,7 +463,13 @@ export default function ProductDetailPage() {
                     height={1000}
                     className="w-full h-full object-cover"
                     priority
+                    onLoad={() => setImageLoading(false)}
                   />
+                  {imageLoading && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 dark:bg-black/30">
+                      <Spinner size="lg" className="text-white" />
+                    </div>
+                  )}
                 </div>
                 {isOutOfStock && (
                   <div className="absolute top-4 left-4 px-3 py-1.5 bg-gray-600 text-white text-sm font-bold rounded-full">
@@ -447,7 +491,12 @@ export default function ProductDetailPage() {
                     {allImages.map((img, i) => (
                       <button
                         key={i}
-                        onClick={() => setMainImage(img)}
+                        onClick={() => {
+                          if (img !== mainImage) {
+                            setImageLoading(true);
+                            setMainImage(img);
+                          }
+                        }}
                         className={`w-16 h-16 shrink-0 rounded-lg overflow-hidden border-2 transition-all ${
                           mainImage === img
                             ? "border-accent-teal"
@@ -759,96 +808,120 @@ export default function ProductDetailPage() {
         )}
 
         {/* Reviews Section */}
-        <section className="py-8 lg:py-12 bg-white dark:bg-black border-t border-gray-200 dark:border-[#1a1a1a]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <section className="py-12 lg:py-16 bg-gray-50/50 dark:bg-[#050505]">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Section header */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-10">
               <div>
-                <h2 className="text-xl lg:text-2xl font-bold text-black dark:text-white mb-2 font-bengali">
+                <h2 className="text-2xl lg:text-3xl font-bold text-black dark:text-white mb-2 font-bengali tracking-tight">
                   রিভিউ সমূহ
                 </h2>
                 <div className="flex items-center gap-3">
-                  <StarRating rating={Math.round(product.ratings?.average ?? 0)} size="md" />
-                  <span className="text-gray-600 dark:text-[#888888] text-sm">
-                    {(product.ratings?.average ?? 0).toFixed(1)} ({product.ratings?.count ?? 0} রিভিউ)
+                  <div className="flex items-center gap-2">
+                    <StarRating rating={Math.round(reviewAverage)} size="lg" />
+                    <span className="text-lg font-semibold text-black dark:text-white">
+                      {reviewAverage.toFixed(1)}
+                    </span>
+                  </div>
+                  <span className="text-gray-500 dark:text-gray-400 text-sm">
+                    ({reviewTotal} রিভিউ)
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Write Review Form */}
-            {session ? (
+            {/* Write Review Form - only show if user has purchased */}
+            {session && canReview ? (
               <form
                 onSubmit={handleReviewSubmit}
-                className="bg-gray-50 dark:bg-[#111111] rounded-2xl p-4 sm:p-6 mb-8 border border-gray-200 dark:border-[#222222]"
+                className="mb-10 rounded-2xl bg-white dark:bg-[#0d0d0d] p-6 sm:p-8 shadow-sm ring-1 ring-gray-200/80 dark:ring-white/[0.06]"
               >
-                <h3 className="text-lg font-semibold text-black dark:text-white mb-4 font-bengali">
+                <h3 className="text-lg font-semibold text-black dark:text-white mb-6 font-bengali">
                   আপনার রিভিউ লিখুন
                 </h3>
-                <div className="mb-4">
-                  <label className="block text-sm text-gray-600 dark:text-[#888888] mb-2 font-bengali">
-                    রেটিং দিন
-                  </label>
-                  <StarRating
-                    rating={reviewRating}
-                    size="lg"
-                    interactive
-                    onChange={setReviewRating}
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-sm text-gray-600 dark:text-[#888888] mb-2 font-bengali">
-                    আপনার মতামত
-                  </label>
-                  <textarea
-                    rows={4}
-                    value={reviewComment}
-                    onChange={(e) => setReviewComment(e.target.value)}
-                    placeholder="এই প্রোডাক্ট সম্পর্কে আপনার অভিজ্ঞতা শেয়ার করুন..."
-                    className="w-full px-4 py-3 bg-white dark:bg-[#1a1a1a] border border-gray-300 dark:border-[#333333] rounded-xl text-black dark:text-white placeholder-gray-400 dark:placeholder-[#666666] focus:outline-none focus:border-accent-teal resize-none text-sm"
-                    maxLength={2000}
-                  />
+                <div className="space-y-5">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 font-bengali">
+                      রেটিং দিন
+                    </label>
+                    <StarRating
+                      rating={reviewRating}
+                      size="lg"
+                      interactive
+                      onChange={setReviewRating}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 font-bengali">
+                      আপনার মতামত
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={reviewComment}
+                      onChange={(e) => setReviewComment(e.target.value)}
+                      placeholder="এই প্রোডাক্ট সম্পর্কে আপনার অভিজ্ঞতা শেয়ার করুন..."
+                      className="w-full px-4 py-3.5 bg-gray-50 dark:bg-[#141414] border-0 rounded-xl text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent-teal/50 resize-none text-sm transition-shadow"
+                      maxLength={2000}
+                    />
+                  </div>
                 </div>
                 {reviewError && (
-                  <p className="text-sm text-red-500 mb-3 font-bengali">{reviewError}</p>
+                  <p className="mt-3 text-sm text-red-500 font-bengali">{reviewError}</p>
                 )}
                 {reviewSuccess && (
-                  <p className="text-sm text-accent-green mb-3 font-bengali">{reviewSuccess}</p>
+                  <p className="mt-3 text-sm text-accent-green font-bengali">{reviewSuccess}</p>
                 )}
                 <button
                   type="submit"
                   disabled={reviewSubmitting}
-                  className="w-full sm:w-auto px-6 py-3 bg-accent-teal text-white rounded-xl text-sm font-medium hover:bg-accent-teal/90 transition-colors font-bengali disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="mt-6 w-full sm:w-auto px-8 py-3.5 bg-accent-teal text-white rounded-xl text-sm font-semibold hover:bg-accent-teal/90 transition-all hover:shadow-lg hover:shadow-accent-teal/20 font-bengali disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {reviewSubmitting && <Spinner size="sm" className="text-white" />}
                   রিভিউ সাবমিট করুন
                 </button>
               </form>
-            ) : (
-              <div className="bg-gray-50 dark:bg-[#111111] rounded-2xl p-6 mb-8 border border-gray-200 dark:border-[#222222] text-center">
-                <p className="text-gray-600 dark:text-gray-400 mb-4 font-bengali">
+            ) : !session ? (
+              <div className="mb-10 rounded-2xl bg-white dark:bg-[#0d0d0d] p-8 text-center ring-1 ring-gray-200/80 dark:ring-white/[0.06]">
+                <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-gray-100 dark:bg-[#1a1a1a] flex items-center justify-center">
+                  <svg className="w-7 h-7 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                  </svg>
+                </div>
+                <p className="text-gray-600 dark:text-gray-400 mb-5 font-bengali">
                   রিভিউ দিতে লগিন করুন
                 </p>
                 <Button variant="secondary" size="sm" onClick={() => setLoginModalOpen(true)}>
                   <span className="font-bengali">লগিন করুন</span>
                 </Button>
               </div>
+            ) : (
+              <div className="mb-10 rounded-2xl bg-white dark:bg-[#0d0d0d] p-8 text-center ring-1 ring-gray-200/80 dark:ring-white/[0.06]">
+                <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-accent-teal/10 dark:bg-accent-teal/20 flex items-center justify-center">
+                  <svg className="w-7 h-7 text-accent-teal" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                  </svg>
+                </div>
+                <p className="text-gray-600 dark:text-gray-400 font-bengali">
+                  এই প্রোডাক্ট কিনে রিভিউ দিন
+                </p>
+              </div>
             )}
 
             {/* Reviews List */}
             {reviews.length > 0 ? (
-              <div className="space-y-4">
+              <div className="space-y-5">
                 {reviews.map((review, i) => (
                   <ReviewCard key={review._id} review={review} index={i} />
                 ))}
                 {reviews.length < reviewTotal && (
-                  <div className="text-center mt-8">
+                  <div className="text-center pt-6">
                     <button
                       onClick={() => {
                         const next = reviewPage + 1;
                         setReviewPage(next);
                         fetchReviews(next);
                       }}
-                      className="px-8 py-3 border border-gray-300 dark:border-[#3a3a3a] rounded-xl text-black dark:text-white font-medium hover:bg-gray-100 dark:hover:bg-[#1a1a1a] transition-colors font-bengali"
+                      className="px-8 py-3.5 rounded-xl bg-white dark:bg-[#0d0d0d] text-gray-700 dark:text-gray-300 font-medium ring-1 ring-gray-200/80 dark:ring-white/[0.06] hover:bg-gray-50 dark:hover:bg-[#141414] hover:ring-gray-300/80 dark:hover:ring-white/10 transition-all font-bengali"
                     >
                       আরো দেখুন
                     </button>
@@ -856,9 +929,16 @@ export default function ProductDetailPage() {
                 )}
               </div>
             ) : (
-              <p className="text-center text-gray-500 dark:text-gray-400 py-8 font-bengali">
-                এখনো কোনো রিভিউ নেই। প্রথম রিভিউ দিন!
-              </p>
+              <div className="rounded-2xl bg-white dark:bg-[#0d0d0d] p-12 text-center ring-1 ring-gray-200/80 dark:ring-white/[0.06]">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gray-100 dark:bg-[#1a1a1a] flex items-center justify-center">
+                  <svg className="w-8 h-8 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.25} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
+                  </svg>
+                </div>
+                <p className="text-gray-500 dark:text-gray-400 font-bengali">
+                  এখনো কোনো রিভিউ নেই। প্রথম রিভিউ দিন!
+                </p>
+              </div>
             )}
           </div>
         </section>

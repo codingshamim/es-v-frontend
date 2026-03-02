@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { getOrder } from "@/app/actions/orders";
 import { Spinner } from "@/components/ui/Spinner";
@@ -182,11 +183,33 @@ function OrderTimeline({
 }
 
 export default function TrackOrderPage() {
+  const searchParams = useSearchParams();
+  const orderFromUrl = searchParams.get("order")?.trim();
   const [orderId, setOrderId] = useState("");
   const [order, setOrder] = useState<TrackedOrder | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [searched, setSearched] = useState(false);
+
+  useEffect(() => {
+    if (orderFromUrl) {
+      setOrderId(orderFromUrl);
+      setOrder(null);
+      setError("");
+      setSearched(true);
+      setLoading(true);
+      getOrder(orderFromUrl)
+        .then((result) => {
+          if (result.success && result.data) {
+            setOrder(result.data as unknown as TrackedOrder);
+          } else {
+            setError(result.message || "অর্ডার খুঁজে পাওয়া যায়নি");
+          }
+        })
+        .catch(() => setError("অর্ডার খুঁজতে ব্যর্থ। আবার চেষ্টা করুন।"))
+        .finally(() => setLoading(false));
+    }
+  }, [orderFromUrl]);
 
   async function handleTrack(e: React.FormEvent) {
     e.preventDefault();

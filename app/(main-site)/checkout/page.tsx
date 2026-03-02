@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -13,6 +13,7 @@ import {
   getDistricts,
   getCitiesForDistrict,
 } from "@/lib/data/bangladesh-locations";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import type { CreateOrderPayload } from "@/app/actions/orders";
 
 function formatPrice(amount: number) {
@@ -69,8 +70,10 @@ export default function CheckoutPage() {
     type: "success" | "error";
     message: string;
   } | null>(null);
-  const [prefilled, setPrefilled] = useState(false);
+  const [addressLoaded, setAddressLoaded] = useState(false);
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
+  const [showPaymentConfirmModal, setShowPaymentConfirmModal] = useState(false);
+  const orderSuccessRef = useRef(false);
 
   const districts = useMemo(() => getDistricts(), []);
   const cities = useMemo(
@@ -114,45 +117,54 @@ export default function CheckoutPage() {
   }, [siteSettings?.payment]);
 
   useEffect(() => {
-    if (items.length === 0) {
+    if (items.length === 0 && !orderSuccessRef.current) {
       router.replace("/cart");
     }
   }, [items.length, router]);
 
   useEffect(() => {
-    if (!session?.user || prefilled) return;
+    if (!session?.user || addressLoaded) return;
 
+    let cancelled = false;
     const user = session.user;
-    setForm((prev) => ({
-      ...prev,
-      name: user.name ?? prev.name,
-      phone: (user as any).phone ?? prev.phone,
-      email: user.email ?? prev.email,
-    }));
 
     (async () => {
       try {
         const res = await getAddresses();
-        if (res.success && res.data) {
-          const defaultAddr = res.data.find((a) => a.isDefault) ?? res.data[0];
-          if (defaultAddr) {
-            setForm((prev) => ({
-              ...prev,
-              name: prev.name || defaultAddr.name,
-              phone: prev.phone || defaultAddr.phone,
-              district: defaultAddr.district,
-              city: defaultAddr.city,
-              address: defaultAddr.address,
-            }));
-          }
-        }
+        if (cancelled) return;
+
+        const defaultAddr =
+          res.success && res.data?.length
+            ? res.data.find((a) => a.isDefault) ?? res.data[0]
+            : null;
+
+        setForm((prev) => ({
+          ...prev,
+          name: defaultAddr?.name || user.name || prev.name || "",
+          phone: defaultAddr?.phone || (user as { phone?: string }).phone || prev.phone || "",
+          email: user.email ?? prev.email,
+          district: defaultAddr?.district ?? prev.district ?? "",
+          city: defaultAddr?.city ?? prev.city ?? "",
+          address: defaultAddr?.address ?? prev.address ?? "",
+        }));
       } catch {
-        /* ignore */
+        if (!cancelled) {
+          setForm((prev) => ({
+            ...prev,
+            name: user.name ?? prev.name,
+            phone: (user as { phone?: string }).phone ?? prev.phone,
+            email: user.email ?? prev.email,
+          }));
+        }
+      } finally {
+        if (!cancelled) setAddressLoaded(true);
       }
     })();
 
-    setPrefilled(true);
-  }, [session, prefilled]);
+    return () => {
+      cancelled = true;
+    };
+  }, [session, addressLoaded]);
 
   useEffect(() => {
     if (!toast) return;
@@ -209,9 +221,10 @@ export default function CheckoutPage() {
     return Object.keys(e).length === 0;
   }
 
-  async function placeOrder() {
+  async function submitOrder() {
     if (!validate()) return;
     setIsSubmitting(true);
+    setShowPaymentConfirmModal(false);
 
     try {
       const payload: CreateOrderPayload = {
@@ -241,6 +254,7 @@ export default function CheckoutPage() {
       const result = await createOrder(payload);
 
       if (result.success && result.orderId) {
+        orderSuccessRef.current = true;
         clearCart();
         router.push(
           `/validate-payment?transaction=${result.orderId}&method=${paymentMethod}`,
@@ -261,6 +275,21 @@ export default function CheckoutPage() {
     }
   }
 
+  function handlePlaceOrderClick() {
+    if (!validate()) return;
+    const isEnabled =
+      (paymentMethod === "cod" && paymentOpts.cod) ||
+      (paymentMethod === "bkash" && paymentOpts.bkash) ||
+      (paymentMethod === "nagad" && paymentOpts.nagad) ||
+      (paymentMethod === "rocket" && paymentOpts.rocket);
+    // Show delivery charge confirmation before payment for all enabled methods
+    if (isEnabled) {
+      setShowPaymentConfirmModal(true);
+    } else {
+      submitOrder();
+    }
+  }
+
   if (items.length === 0) return null;
 
   const inputClass =
@@ -277,15 +306,15 @@ export default function CheckoutPage() {
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
           {/* ── Progress Steps ── */}
           <div className="mb-8 flex items-center justify-center gap-0">
-            {/* Step 1 - কার্ট (completed) */}
-            <div className="flex items-center gap-2">
+            {/* Step 1 - কার্ট (completed, tab) */}
+            <Link href="/cart" className="flex items-center gap-2 rounded-lg transition-colors hover:opacity-80">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-green text-white">
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                 </svg>
               </div>
               <span className="text-sm font-medium text-accent-green font-bengali">কার্ট</span>
-            </div>
+            </Link>
 
             <div className="mx-3 h-px w-12 bg-accent-green sm:w-20" />
 
@@ -299,13 +328,13 @@ export default function CheckoutPage() {
 
             <div className="mx-3 h-px w-12 bg-gray-300 dark:bg-gray-600 sm:w-20" />
 
-            {/* Step 3 - সম্পন্ন (upcoming) */}
-            <div className="flex items-center gap-2">
+            {/* Step 3 - সম্পন্ন (upcoming, tab) */}
+            <Link href="/order-confirmed" className="flex items-center gap-2 rounded-lg transition-colors hover:opacity-80">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 dark:bg-[#1a1a1a] text-gray-400 dark:text-gray-500 text-sm font-bold">
                 ৩
               </div>
               <span className="text-sm font-medium text-gray-400 dark:text-gray-500 font-bengali">সম্পন্ন</span>
-            </div>
+            </Link>
           </div>
 
           {/* ── Toast ── */}
@@ -726,7 +755,7 @@ export default function CheckoutPage() {
                       variant="secondary"
                       fullWidth
                       className="font-bengali"
-                      onClick={placeOrder}
+                      onClick={handlePlaceOrderClick}
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? (
@@ -794,7 +823,7 @@ export default function CheckoutPage() {
             </p>
           </div>
           <button
-            onClick={placeOrder}
+            onClick={handlePlaceOrderClick}
             disabled={isSubmitting}
             className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-black dark:bg-white text-white dark:text-black px-6 py-3 text-sm font-medium transition-all hover:bg-[#1a1a1a]/80 dark:hover:bg-white/80 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-70 font-bengali"
           >
@@ -812,6 +841,95 @@ export default function CheckoutPage() {
           </button>
         </div>
       </div>
+
+      {/* Payment Confirmation Modal - ডেলিভারি চার্জ before pay for all enabled methods */}
+      {showPaymentConfirmModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => !isSubmitting && setShowPaymentConfirmModal(false)}
+          />
+          <div className="relative w-full max-w-md bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] shadow-xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                  paymentMethod === "cod" ? "bg-orange-100 dark:bg-orange-900/30" :
+                  paymentMethod === "bkash" ? "bg-pink-100 dark:bg-pink-900/30" :
+                  paymentMethod === "nagad" ? "bg-orange-100 dark:bg-orange-900/30" :
+                  "bg-purple-100 dark:bg-purple-900/30"
+                }`}>
+                  <span className={`font-bold text-sm ${
+                    paymentMethod === "cod" ? "text-orange-600 dark:text-orange-400" :
+                    paymentMethod === "bkash" ? "text-pink-600 dark:text-pink-400" :
+                    paymentMethod === "nagad" ? "text-orange-600 dark:text-orange-400" :
+                    "text-purple-600 dark:text-purple-400"
+                  }`}>
+                    {paymentMethod === "cod" ? "COD" : paymentMethod === "bkash" ? "bK" : paymentMethod === "nagad" ? "ন" : "R"}
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold text-black dark:text-white font-bengali">
+                  {paymentMethod === "cod" ? "ক্যাশ অন ডেলিভারি" : paymentMethod === "bkash" ? "bKash" : paymentMethod === "nagad" ? "Nagad" : "Rocket"} – পেমেন্ট নিশ্চিত করুন
+                </h3>
+              </div>
+              <button
+                onClick={() => !isSubmitting && setShowPaymentConfirmModal(false)}
+                className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[#1a1a1a] text-gray-400 transition"
+              >
+                <XMarkIcon className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-gray-600 dark:text-gray-400 text-sm font-bengali mb-4">
+              {paymentMethod === "cod"
+                ? "ডেলিভারি চার্জ প্রথমে অনলাইনে পরিশোধ করুন। ডেলিভারির সময় সাবটোটাল নগদ পরিশোধ করবেন।"
+                : "নিচের ডেলিভারি চার্জসহ মোট টাকা পেমেন্ট পেজে পরিশোধ করবেন।"}
+            </p>
+            <div className="bg-gray-50 dark:bg-[#0a0a0a] rounded-xl p-4 space-y-2 mb-6">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600 dark:text-gray-400 font-bengali">ডেলিভারি চার্জ <span className="text-amber-600 dark:text-amber-400">{paymentMethod === "cod" ? "(অনলাইনে প্রথমে)" : ""}</span></span>
+                <span className="font-semibold text-black dark:text-white">{formatPrice(deliveryCharge)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600 dark:text-gray-400 font-bengali">সাবটোটাল <span className="text-amber-600 dark:text-amber-400">{paymentMethod === "cod" ? "(ডেলিভারিতে নগদ)" : ""}</span></span>
+                <span className="font-medium text-black dark:text-white">{formatPrice(subtotal)}</span>
+              </div>
+              <div className="flex justify-between text-base pt-2 border-t border-gray-200 dark:border-[#1a1a1a]">
+                <span className="font-bold text-black dark:text-white font-bengali">সর্বমোট</span>
+                <span className="text-xl font-bold text-accent-teal">{formatPrice(total)}</span>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                fullWidth
+                className="font-bengali"
+                onClick={() => setShowPaymentConfirmModal(false)}
+                disabled={isSubmitting}
+              >
+                বাতিল
+              </Button>
+              <Button
+                variant="secondary"
+                fullWidth
+                className="font-bengali"
+                onClick={submitOrder}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    অর্ডার হচ্ছে...
+                  </span>
+                ) : (
+                  "নিশ্চিত করুন"
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

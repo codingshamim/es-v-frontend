@@ -1,6 +1,7 @@
 "use server";
 
 import mongoose from "mongoose";
+import { emitToAdmin } from "@/lib/socket-server";
 import { auth } from "@/lib/auth/auth";
 import { connectDB } from "@/lib/db/connectDB";
 import Order from "@/lib/models/Order";
@@ -217,6 +218,7 @@ export async function createOrder(
       dbSession.endSession();
 
       const created = order[0];
+      emitToAdmin("notification", { type: "order", orderId: created.orderId });
       return {
         success: true,
         message: "অর্ডার সফলভাবে তৈরি হয়েছে",
@@ -313,34 +315,30 @@ export async function verifyPayment(
       return { success: false, message: "অর্ডার খুঁজে পাওয়া যায়নি" };
     }
 
-    if (order.payment.method === "cod") {
-      return {
-        success: false,
-        message: "ক্যাশ অন ডেলিভারি অর্ডারে পেমেন্ট ভেরিফিকেশন প্রয়োজন নেই",
-      };
-    }
-
     if (order.payment.status === "verified") {
       return { success: false, message: "পেমেন্ট ইতিমধ্যে ভেরিফাই করা হয়েছে" };
     }
 
-    order.payment.status = "verified";
+    // Only save transaction details — admin will manually verify
     order.payment.senderNumber = senderNumber.trim().replace(/\s/g, "");
     order.payment.transactionId = transactionId.trim();
-    order.payment.verifiedAt = new Date();
+    // Do NOT set payment.status = "verified" — manual verification by admin
 
-    order.status = "confirmed";
+    const note =
+      order.payment.method === "cod"
+        ? "কাস্টমার ডেলিভারি চার্জের ট্রানজেকশন আইডি জমা দিয়েছে (অ্যাডমিন যাচাই করবেন)"
+        : `কাস্টমার পেমেন্ট তথ্য জমা দিয়েছে (অ্যাডমিন যাচাই করবেন) — TrxID: ${transactionId.trim()}`;
     order.statusHistory.push({
-      status: "confirmed",
+      status: order.status,
       timestamp: new Date(),
-      note: `পেমেন্ট ভেরিফাই হয়েছে (${order.payment.method})`,
+      note,
     });
 
     await order.save();
 
     return {
       success: true,
-      message: "পেমেন্ট সফলভাবে ভেরিফাই হয়েছে",
+      message: "পেমেন্ট তথ্য জমা হয়েছে। অ্যাডমিন যাচাই করবেন।",
       data: {
         orderId: order.orderId,
         status: order.status,
@@ -407,6 +405,105 @@ export async function confirmCodOrder(orderId: string): Promise<OrderResult> {
     return {
       success: false,
       message: "অর্ডার কনফার্ম করতে ব্যর্থ। আবার চেষ্টা করুন।",
+    };
+  }
+}
+
+// ─── getMyOrderCounts ─────────────────────────────────────────────────────────
+
+export async function getMyOrderCounts(): Promise<{
+  success: boolean;
+  total?: number;
+  completed?: number;
+  pending?: number;
+}> {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: true, total: 0, completed: 0, pending: 0 };
+    }
+
+    await connectDB();
+    const userId = session.user.id;
+
+    const [total, deliveredCount, pendingCount] = await Promise.all([
+      Order.countDocuments({ user: userId }),
+      Order.countDocuments({ user: userId, status: "delivered" }),
+      Order.countDocuments({
+        user: userId,
+        status: { $in: ["pending", "confirmed", "processing", "shipped"] },
+      }),
+    ]);
+
+    return {
+      success: true,
+      total: total ?? 0,
+      completed: deliveredCount ?? 0,
+      pending: pendingCount ?? 0,
+    };
+  } catch (error) {
+    console.error("[orders] getMyOrderCounts error:", error);
+    return { success: false };
+  }
+}
+
+// ─── getMyOrders ─────────────────────────────────────────────────────────────
+
+export async function getMyOrders(): Promise<{
+  success: boolean;
+  data?: Array<{
+    _id: string;
+    orderId: string;
+    status: string;
+    createdAt: string;
+    items: Array<{
+      name: string;
+      image: string;
+      size: string;
+      colorName: string;
+      quantity: number;
+      unitPrice: number;
+    }>;
+    pricing: { total: number };
+  }>;
+  message?: string;
+}> {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: true, data: [] };
+    }
+
+    await connectDB();
+    const userId = session.user.id;
+
+    const orders = await Order.find({ user: userId })
+      .sort({ createdAt: -1 })
+      .limit(50)
+      .lean();
+
+    const data = orders.map((o) => ({
+      _id: (o as any)._id?.toString(),
+      orderId: (o as any).orderId,
+      status: (o as any).status,
+      createdAt: (o as any).createdAt,
+      items: ((o as any).items ?? []).map((it: any) => ({
+        name: it.name,
+        image: it.image,
+        size: it.size,
+        colorName: it.colorName ?? it.color ?? "",
+        quantity: it.quantity,
+        unitPrice: it.unitPrice,
+      })),
+      pricing: (o as any).pricing ?? { total: 0 },
+    }));
+
+    return { success: true, data };
+  } catch (error) {
+    console.error("[orders] getMyOrders error:", error);
+    return {
+      success: false,
+      message: "অর্ডার তালিকা লোড করতে ব্যর্থ।",
     };
   }
 }

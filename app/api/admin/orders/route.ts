@@ -1,7 +1,50 @@
 import { requireAdmin } from "@/lib/admin/auth-check";
 import { connectDB } from "@/lib/db/connectDB";
 import Order from "@/lib/models/Order";
+import { createOrderInternal } from "@/lib/orders/create-order-internal";
+import type { CreateOrderPayload } from "@/lib/orders/create-order-internal";
 import { NextRequest } from "next/server";
+
+export async function POST(req: NextRequest) {
+  try {
+    const { authorized, error } = await requireAdmin("order_management");
+    if (!authorized) return error;
+
+    const body = await req.json();
+    const payload: CreateOrderPayload = {
+      items: body.items ?? [],
+      shipping: body.shipping ?? {},
+      paymentMethod: body.paymentMethod ?? "cod",
+      couponCode: body.couponCode,
+    };
+    const userId = typeof body.userId === "string" && body.userId.trim() ? body.userId.trim() : null;
+
+    const result = await createOrderInternal(payload, userId);
+
+    if (!result.success) {
+      return Response.json(
+        { success: false, message: result.message, errors: result.errors },
+        { status: 400 }
+      );
+    }
+
+    return Response.json(
+      {
+        success: true,
+        message: result.message,
+        orderId: result.orderId,
+        data: result.data,
+      },
+      { status: 201 }
+    );
+  } catch (err) {
+    console.error("[admin/orders POST]", err);
+    return Response.json(
+      { success: false, message: "Server error" },
+      { status: 500 }
+    );
+  }
+}
 
 export async function GET(req: NextRequest) {
   try {

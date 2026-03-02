@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getOrder } from "@/app/actions/orders";
 import { Spinner } from "@/components/ui/Spinner";
+import { InvoicePrintButton } from "@/components/invoice/InvoicePrintButton";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -248,28 +249,37 @@ function OrderConfirmedContent() {
   return (
     <main className="min-h-[60vh] pb-12">
       <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
-        {/* ── Progress Steps ── */}
+        {/* ── Progress Steps ── same as cart/checkout/validate-payment */}
         <div
           className="mb-10 flex items-center justify-center gap-0 anim-fade-in"
           style={{ animationDelay: "0ms" }}
         >
-          {["কার্ট", "চেকআউট", "সম্পন্ন"].map((label, i) => (
-            <div key={label} className="flex items-center">
-              <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-green text-white">
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                  </svg>
-                </div>
-                <span className="text-sm font-medium text-accent-green font-bengali">
-                  {label}
-                </span>
-              </div>
-              {i < 2 && (
-                <div className="mx-3 h-px w-12 bg-accent-green sm:w-20" />
-              )}
+          <Link href="/cart" className="flex items-center gap-2 rounded-lg transition-colors hover:opacity-80">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-green text-white">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+              </svg>
             </div>
-          ))}
+            <span className="text-sm font-medium text-accent-green font-bengali">কার্ট</span>
+          </Link>
+          <div className="mx-3 h-px w-12 bg-accent-green sm:w-20" />
+          <Link href="/checkout" className="flex items-center gap-2 rounded-lg transition-colors hover:opacity-80">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-green text-white">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+              </svg>
+            </div>
+            <span className="text-sm font-medium text-accent-green font-bengali">চেকআউট</span>
+          </Link>
+          <div className="mx-3 h-px w-12 bg-accent-green sm:w-20" />
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-green text-white">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+              </svg>
+            </div>
+            <span className="text-sm font-medium text-accent-green font-bengali">সম্পন্ন</span>
+          </div>
         </div>
 
         {/* ── Success Animation ── */}
@@ -567,15 +577,32 @@ function OrderConfirmedContent() {
             </svg>
             শপিং চালিয়ে যান
           </Link>
-          <button
-            onClick={() => window.print()}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-gray-200 dark:border-[#1a1a1a] px-6 py-3.5 text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors hover:bg-gray-50 dark:hover:bg-[#111] font-bengali"
-          >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0 1 10.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0 .229 2.523a1.125 1.125 0 0 1-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0 0 21 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 0 0-1.913-.247M6.34 18H5.25A2.25 2.25 0 0 1 3 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 0 1 1.913-.247m10.5 0a48.536 48.536 0 0 0-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5Zm-3 0h.008v.008H15V10.5Z" />
-            </svg>
-            রসিদ প্রিন্ট করুন
-          </button>
+          <InvoicePrintButton
+            customClass="flex-1"
+            order={{
+              orderId: order.orderId,
+              items: order.items.map((it) => ({
+                name: it.name,
+                size: it.size,
+                colorName: it.colorName,
+                quantity: it.quantity,
+                unitPrice: it.unitPrice,
+              })),
+              shipping: {
+                name: order.shipping.name,
+                phone: order.shipping.phone,
+                district: order.shipping.district,
+                city: order.shipping.city,
+                address: order.shipping.address,
+              },
+              payment: {
+                method: order.payment.method,
+                transactionId: (order.payment as { transactionId?: string }).transactionId,
+              },
+              pricing: order.pricing,
+              createdAt: order.createdAt,
+            }}
+          />
         </div>
 
         {/* ── Help Section ── */}

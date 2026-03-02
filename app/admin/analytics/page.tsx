@@ -108,7 +108,7 @@ export default function AdminAnalyticsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <Spinner size="lg" className="text-teal-500" />
+        <Spinner size="lg" className="text-white dark:text-white" />
       </div>
     );
   }
@@ -121,7 +121,7 @@ export default function AdminAnalyticsPage() {
         </p>
         <button
           onClick={fetchAnalytics}
-          className="px-4 py-2 text-sm font-medium rounded-xl bg-teal-600 text-white hover:bg-teal-700 transition-colors"
+          className="px-4 py-2 text-sm font-medium rounded-xl bg-white text-black hover:bg-gray-100 dark:bg-white dark:text-black dark:hover:bg-gray-200 border border-gray-200 dark:border-white/20 transition-colors"
         >
           Retry
         </button>
@@ -156,8 +156,8 @@ export default function AdminAnalyticsPage() {
               onClick={() => setPeriod(p.value)}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
                 period === p.value
-                  ? "bg-teal-600 text-white"
-                  : "bg-white dark:bg-[#111111] border border-gray-200 dark:border-[#1a1a1a] text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#1a1a1a]"
+                  ? "bg-white text-black dark:bg-white dark:text-black"
+                  : "bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5"
               }`}
             >
               {p.label}
@@ -168,7 +168,7 @@ export default function AdminAnalyticsPage() {
 
       {/* Overview Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] p-5">
+        <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 p-5">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Total Revenue</p>
@@ -182,7 +182,7 @@ export default function AdminAnalyticsPage() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] p-5">
+        <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 p-5">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Total Orders</p>
@@ -190,15 +190,15 @@ export default function AdminAnalyticsPage() {
                 {(data.totalOrders ?? 0).toLocaleString()}
               </p>
             </div>
-            <div className="p-3 rounded-xl bg-teal-50 dark:bg-teal-900/20">
-              <svg className="w-6 h-6 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="p-3 rounded-xl bg-white/10 dark:bg-white/5">
+              <svg className="w-6 h-6 text-white dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] p-5">
+        <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 p-5">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Page Views</p>
@@ -215,7 +215,7 @@ export default function AdminAnalyticsPage() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] p-5">
+        <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 p-5">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Conversion Rate</p>
@@ -233,7 +233,7 @@ export default function AdminAnalyticsPage() {
       {/* Revenue Chart + Orders by Status */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         {/* Revenue Bar Chart */}
-        <div className="xl:col-span-2 bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] p-5">
+        <div className="xl:col-span-2 bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 p-5">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-black dark:text-white">
               Revenue by Day
@@ -263,7 +263,7 @@ export default function AdminAnalyticsPage() {
                       </span>
                       <div className="w-full flex justify-center" style={{ height: "180px" }}>
                         <div
-                          className="w-full max-w-[28px] rounded-t-md bg-teal-500/80 hover:bg-teal-500 transition-colors self-end"
+                          className="w-full max-w-[28px] rounded-t-md bg-white/80 dark:bg-white/80 hover:bg-white dark:hover:bg-white transition-colors self-end"
                           style={{ height: `${Math.max(height, 2)}%` }}
                           title={`${dateLabel}: ${formatBDT(day.revenue)} (${day.orders} orders)`}
                         />
@@ -284,7 +284,7 @@ export default function AdminAnalyticsPage() {
         </div>
 
         {/* Orders by Status - Donut Chart */}
-        <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] p-5">
+        <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 p-5">
           <h2 className="text-lg font-semibold text-black dark:text-white mb-6">
             Orders by Status
           </h2>
@@ -363,14 +363,14 @@ export default function AdminAnalyticsPage() {
       {/* Top Products + Payment Methods */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         {/* Top Selling Products */}
-        <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] p-5">
+        <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-black dark:text-white">
               Top Selling Products
             </h2>
             <Link
               href="/admin/products"
-              className="text-xs text-teal-500 hover:text-teal-400 transition-colors"
+              className="text-xs text-white dark:text-white hover:opacity-80 transition-colors"
             >
               View All
             </Link>
@@ -381,12 +381,12 @@ export default function AdminAnalyticsPage() {
               {data.topProducts.slice(0, 10).map((product, idx) => (
                 <div
                   key={product._id ?? `top-product-${idx}`}
-                  className="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-[#0d0d0d] transition-colors"
+                  className="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
                 >
                   <span className="text-xs font-medium text-gray-400 dark:text-gray-500 w-5 text-center">
                     {idx + 1}
                   </span>
-                  <div className="w-10 h-10 rounded-xl overflow-hidden bg-gray-100 dark:bg-[#1a1a1a] shrink-0">
+                  <div className="w-10 h-10 rounded-xl overflow-hidden bg-gray-100 dark:bg-white/5 shrink-0">
                     {product.image ? (
                       <Image
                         src={product.image}
@@ -423,7 +423,7 @@ export default function AdminAnalyticsPage() {
         </div>
 
         {/* Payment Methods Breakdown */}
-        <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-[#1a1a1a] p-5">
+        <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl border border-gray-200 dark:border-white/10 p-5">
           <h2 className="text-lg font-semibold text-black dark:text-white mb-6">
             Payment Methods
           </h2>
@@ -454,7 +454,7 @@ export default function AdminAnalyticsPage() {
                         </span>
                       </div>
                     </div>
-                    <div className="w-full h-2.5 bg-gray-100 dark:bg-[#1a1a1a] rounded-full overflow-hidden">
+                    <div className="w-full h-2.5 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all duration-500"
                         style={{

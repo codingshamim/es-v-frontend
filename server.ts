@@ -2,6 +2,7 @@ import { createServer } from "http";
 import next from "next";
 import { Server as SocketIOServer } from "socket.io";
 import mongoose from "mongoose";
+import { setIO } from "./lib/socket-server";
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = "localhost";
@@ -40,6 +41,7 @@ app.prepare().then(async () => {
     addTrailingSlash: false,
     cors: { origin: "*", methods: ["GET", "POST"] },
   });
+  setIO(io);
 
   await connectMongo();
 
@@ -100,6 +102,10 @@ app.prepare().then(async () => {
 
     socket.on("join-admin", () => {
       socket.join("admin-chat");
+    });
+
+    socket.on("join-admin-notifications", () => {
+      socket.join("admin-notifications");
     });
 
     socket.on(
@@ -165,6 +171,9 @@ app.prepare().then(async () => {
               unreadCount: conversation.unreadCount,
               senderName,
             });
+            if ((sender ?? "customer") === "customer" && (conversation.unreadCount ?? 0) > 0) {
+              io.to("admin-notifications").emit("notification", { type: "chat", unreadCount: conversation.unreadCount });
+            }
           }
         } catch (err) {
           console.error("send-message error:", err);
@@ -279,6 +288,7 @@ app.prepare().then(async () => {
             lastMessageAt: new Date(),
             unreadCount: conversation.unreadCount,
           });
+          io.to("admin-notifications").emit("notification", { type: "chat", unreadCount: conversation.unreadCount });
         } catch (err) {
           console.error("start-conversation error:", err);
           socket.emit("error", { message: "Failed to start conversation" });

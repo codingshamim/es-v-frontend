@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { getMyOrderCounts } from "@/app/actions/orders";
 import { ProfileHeader } from "./ProfileHeader";
 import { ProfileTabs, type ProfileTabId } from "./ProfileTabs";
 import { PersonalInfoTab } from "./PersonalInfoTab";
@@ -13,6 +14,23 @@ import { SettingsTab } from "./SettingsTab";
 export function ProfileView() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<ProfileTabId>("personal");
+  const [orderCounts, setOrderCounts] = useState({
+    total: 0,
+    completed: 0,
+    pending: 0,
+  });
+
+  useEffect(() => {
+    getMyOrderCounts().then((res) => {
+      if (res.success && res.total !== undefined) {
+        setOrderCounts({
+          total: res.total ?? 0,
+          completed: res.completed ?? 0,
+          pending: res.pending ?? 0,
+        });
+      }
+    });
+  }, []);
 
   if (!user) return null;
 
@@ -48,9 +66,9 @@ export function ProfileView() {
           name={name}
           email={email}
           image={user.image}
-          totalOrders={12}
-          completedOrders={8}
-          pendingOrders={3}
+          totalOrders={orderCounts.total}
+          completedOrders={orderCounts.completed}
+          pendingOrders={orderCounts.pending}
         />
 
         <ProfileTabs activeTab={activeTab} onTabChange={setActiveTab} />

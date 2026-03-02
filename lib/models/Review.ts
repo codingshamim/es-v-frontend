@@ -1,5 +1,11 @@
 import mongoose, { Document, Model, Schema, Types } from "mongoose";
 
+export interface IAdminReply {
+  text: string;
+  repliedAt: Date;
+  repliedBy: Types.ObjectId;
+}
+
 export interface IReview {
   product: Types.ObjectId;
   user?: Types.ObjectId;
@@ -8,6 +14,7 @@ export interface IReview {
   comment: string;
   images: string[];
   isVerifiedPurchase: boolean;
+  adminReply?: IAdminReply;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -58,6 +65,17 @@ const ReviewSchema = new Schema<IReviewDocument, IReviewModel>(
     isVerifiedPurchase: {
       type: Boolean,
       default: false,
+    },
+    adminReply: {
+      type: new Schema(
+        {
+          text: { type: String, default: "", trim: true, maxlength: 2000 },
+          repliedAt: { type: Date, default: null },
+          repliedBy: { type: Schema.Types.ObjectId, ref: "User", default: null },
+        },
+        { _id: false },
+      ),
+      default: null,
     },
   },
   { timestamps: true },
