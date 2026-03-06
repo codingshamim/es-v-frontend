@@ -16,6 +16,7 @@ import {
   QuickLoginModal,
   type ProductSelection,
 } from "@/components/modals";
+import { savePendingCartAction } from "@/lib/pending-cart-action";
 import type { Product } from "@/lib/types";
 
 interface ProductCardProps extends Product {
@@ -56,6 +57,7 @@ export function ProductCard({
   const handleBuyNow = useCallback(
     (selection: ProductSelection) => {
       if (!session) {
+        savePendingCartAction({ action: "buyNow", selection });
         setProductModalOpen(false);
         setLoginModalOpen(true);
         return;
@@ -69,11 +71,17 @@ export function ProductCard({
 
   const handleAddToCart = useCallback(
     (selection: ProductSelection) => {
+      if (!session) {
+        savePendingCartAction({ action: "addToCart", selection });
+        setProductModalOpen(false);
+        setLoginModalOpen(true);
+        return;
+      }
       addToCart(selection);
       setProductModalOpen(false);
       setToastVisible(true);
     },
-    [addToCart],
+    [session, addToCart],
   );
 
   const handleSizeDetailsClick = useCallback(() => {

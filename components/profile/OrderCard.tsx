@@ -9,7 +9,14 @@ interface OrderItem {
   image: string;
 }
 
-type OrderStatusDisplay = "completed" | "pending" | "cancelled" | "processing" | "shipped" | "confirmed";
+type OrderStatusDisplay =
+  | "completed"
+  | "pending"
+  | "cancelled"
+  | "processing"
+  | "shipped"
+  | "confirmed"
+  | "delivered";
 
 interface OrderCardProps {
   orderId: string;

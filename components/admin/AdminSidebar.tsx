@@ -15,22 +15,38 @@ import {
   StarIcon,
   Cog6ToothIcon,
   ArrowRightStartOnRectangleIcon,
+  EnvelopeIcon,
 } from "@heroicons/react/24/outline";
+import type { AdminPermission } from "@/lib/admin/permissions";
+import { hasPermission } from "@/lib/admin/permissions";
 
-const NAV_ITEMS = [
+const NAV_ITEMS: Array<{
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  permission?: AdminPermission;
+  badge?: boolean;
+  pulse?: boolean;
+}> = [
   { href: "/admin", label: "Dashboard", icon: HomeIcon },
-  { href: "/admin/orders", label: "Orders", icon: ClipboardDocumentListIcon, badge: true },
-  { href: "/admin/products", label: "Products", icon: CubeIcon },
-  { href: "/admin/categories", label: "Categories", icon: TagIcon },
-  { href: "/admin/users", label: "Users", icon: UsersIcon },
-  { href: "/admin/analytics", label: "Analytics", icon: ChartBarIcon },
-  { href: "/admin/chat", label: "Live Chat", icon: ChatBubbleLeftRightIcon, pulse: true },
-  { href: "/admin/coupons", label: "Coupons", icon: TicketIcon },
-  { href: "/admin/reviews", label: "Reviews", icon: StarIcon },
+  { href: "/admin/orders", label: "Orders", icon: ClipboardDocumentListIcon, permission: "order_management", badge: true },
+  { href: "/admin/products", label: "Products", icon: CubeIcon, permission: "product_management" },
+  { href: "/admin/categories", label: "Categories", icon: TagIcon, permission: "category_management" },
+  { href: "/admin/users", label: "Users", icon: UsersIcon, permission: "user_management" },
+  { href: "/admin/analytics", label: "Analytics", icon: ChartBarIcon, permission: "analytics_access" },
+  { href: "/admin/chat", label: "Live Chat", icon: ChatBubbleLeftRightIcon, permission: "chat_access", pulse: true },
+  { href: "/admin/coupons", label: "Coupons", icon: TicketIcon, permission: "coupon_management" },
+  { href: "/admin/reviews", label: "Reviews", icon: StarIcon, permission: "review_management" },
+  { href: "/admin/contact-messages", label: "Contact Messages", icon: EnvelopeIcon, permission: "contact_access" },
 ];
 
-const BOTTOM_NAV = [
-  { href: "/admin/settings", label: "Settings", icon: Cog6ToothIcon },
+const BOTTOM_NAV: Array<{
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  permission?: AdminPermission;
+}> = [
+  { href: "/admin/settings", label: "Settings", icon: Cog6ToothIcon, permission: "settings_access" },
 ];
 
 interface AdminSidebarProps {
@@ -42,6 +58,16 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const user = session?.user;
+  const role = (user as { role?: string })?.role ?? "user";
+  const permissions = (user as { permissions?: string[] })?.permissions ?? [];
+
+  function canSeeItem(item: { permission?: AdminPermission }) {
+    if (!item.permission) return true;
+    return hasPermission(role, permissions, item.permission);
+  }
+
+  const visibleNavItems = NAV_ITEMS.filter(canSeeItem);
+  const visibleBottomNav = BOTTOM_NAV.filter(canSeeItem);
 
   function isActive(href: string) {
     if (href === "/admin") return pathname === "/admin";
@@ -76,7 +102,7 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
         </div>
 
         <nav className="flex-1 overflow-y-auto p-4 space-y-1">
-          {NAV_ITEMS.map((item) => {
+          {visibleNavItems.map((item) => {
             const active = isActive(item.href);
             return (
               <Link
@@ -99,7 +125,7 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
           })}
 
           <div className="pt-4 mt-4 border-t border-gray-200 dark:border-white/10">
-            {BOTTOM_NAV.map((item) => {
+            {visibleBottomNav.map((item) => {
               const active = isActive(item.href);
               return (
                 <Link

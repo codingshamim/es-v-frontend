@@ -13,6 +13,7 @@ import {
   QuickLoginModal,
   SizeChartModal,
 } from "@/components/modals";
+import { savePendingCartAction } from "@/lib/pending-cart-action";
 
 interface ProductColor {
   name: string;
@@ -314,6 +315,21 @@ export default function ProductDetailPage() {
     return () => clearTimeout(t);
   }, [cartToast]);
 
+  function buildSelection() {
+    if (!product) return null;
+    return {
+      productId: product._id,
+      name: product.name,
+      image: product.images.main,
+      size: selectedSize,
+      color: selectedColor || "default",
+      colorName: selectedColorName || "Default",
+      quantity,
+      unitPrice: product.pricing.salePrice ?? product.pricing.regularPrice,
+      originalPrice: product.pricing.regularPrice,
+    };
+  }
+
   function handleBuyNow() {
     if (!product) return;
     const hasColors = product.colors.length > 0;
@@ -327,21 +343,14 @@ export default function ProductDetailPage() {
       );
       return;
     }
+    const selection = buildSelection();
+    if (!selection) return;
     if (!session) {
+      savePendingCartAction({ action: "buyNow", selection });
       setLoginModalOpen(true);
       return;
     }
-    addToCart({
-      productId: product._id,
-      name: product.name,
-      image: product.images.main,
-      size: selectedSize,
-      color: selectedColor || "default",
-      colorName: selectedColorName || "Default",
-      quantity,
-      unitPrice: product.pricing.salePrice ?? product.pricing.regularPrice,
-      originalPrice: product.pricing.regularPrice,
-    });
+    addToCart(selection);
     router.push("/checkout");
   }
 
@@ -358,17 +367,14 @@ export default function ProductDetailPage() {
       );
       return;
     }
-    addToCart({
-      productId: product._id,
-      name: product.name,
-      image: product.images.main,
-      size: selectedSize,
-      color: selectedColor || "default",
-      colorName: selectedColorName || "Default",
-      quantity,
-      unitPrice: product.pricing.salePrice ?? product.pricing.regularPrice,
-      originalPrice: product.pricing.regularPrice,
-    });
+    const selection = buildSelection();
+    if (!selection) return;
+    if (!session) {
+      savePendingCartAction({ action: "addToCart", selection });
+      setLoginModalOpen(true);
+      return;
+    }
+    addToCart(selection);
     setCartToast(true);
   }
 
@@ -946,7 +952,10 @@ export default function ProductDetailPage() {
 
       {/* Modals */}
       <SizeChartModal open={sizeChartOpen} onClose={() => setSizeChartOpen(false)} />
-      <QuickLoginModal open={loginModalOpen} onClose={() => setLoginModalOpen(false)} />
+      <QuickLoginModal
+        open={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+      />
 
       {/* Cart Toast */}
       {cartToast && (

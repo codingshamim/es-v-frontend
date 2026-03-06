@@ -14,6 +14,7 @@ import {
   QuickLoginModal,
   type ProductSelection,
 } from "@/components/modals";
+import { savePendingCartAction } from "@/lib/pending-cart-action";
 import type { ProductColor, ProductSize } from "@/lib/types";
 
 interface ShopProduct {
@@ -61,7 +62,7 @@ function ProductCard({
   const isOutOfStock = product.totalStock === 0 || product.status === "Out of Stock";
 
   return (
-    <div className="group bg-gray-50 dark:bg-black rounded-2xl overflow-hidden border border-gray-200 dark:border-[#222222] transition-all hover:shadow-lg hover:shadow-accent-teal/5">
+    <div className="group bg-white dark:bg-black rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 transition-all hover:shadow-lg hover:shadow-accent-teal/5">
       <Link href={`/products/${product.slug}`} className="block">
         <div className="relative aspect-square overflow-hidden">
           <Image
@@ -73,7 +74,7 @@ function ProductCard({
           />
           {isOutOfStock && (
             <div className="absolute top-3 left-3">
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-gray-600 text-white">
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-black/80 text-white">
                 Out of Stock
               </span>
             </div>
@@ -115,7 +116,7 @@ function ProductCard({
         <button
           disabled={isOutOfStock}
           onClick={() => onQuickBuy(product)}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-gray-200 dark:border-[#333333] bg-gray-100 dark:bg-[#1a1a1a] text-black dark:text-white hover:bg-gray-200 dark:hover:bg-[#252525] transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-bengali"
+          className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-black/10 dark:border-white/10 bg-white dark:bg-black text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-bengali"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -131,13 +132,13 @@ function ShopSkeleton() {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
       {Array.from({ length: 8 }).map((_, i) => (
-        <div key={i} className="bg-gray-50 dark:bg-[#0a0a0a] rounded-2xl overflow-hidden border border-gray-200 dark:border-[#222222] animate-pulse">
-          <div className="aspect-square bg-gray-200 dark:bg-[#1a1a1a]" />
+        <div key={i} className="bg-white dark:bg-black rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 animate-pulse">
+          <div className="aspect-square bg-black/5 dark:bg-white/5" />
           <div className="p-4 space-y-3">
-            <div className="h-4 bg-gray-200 dark:bg-[#1a1a1a] rounded w-3/4" />
-            <div className="h-3 bg-gray-200 dark:bg-[#1a1a1a] rounded w-1/2" />
-            <div className="h-5 bg-gray-200 dark:bg-[#1a1a1a] rounded w-1/3" />
-            <div className="h-9 bg-gray-200 dark:bg-[#1a1a1a] rounded" />
+            <div className="h-4 bg-black/5 dark:bg-white/5 rounded w-3/4" />
+            <div className="h-3 bg-black/5 dark:bg-white/5 rounded w-1/2" />
+            <div className="h-5 bg-black/5 dark:bg-white/5 rounded w-1/3" />
+            <div className="h-9 bg-black/5 dark:bg-white/5 rounded" />
           </div>
         </div>
       ))}
@@ -233,6 +234,7 @@ function ShopContent() {
 
   function handleBuyNow(selection: ProductSelection) {
     if (!session) {
+      savePendingCartAction({ action: "buyNow", selection });
       setProductModalOpen(false);
       setLoginModalOpen(true);
       return;
@@ -243,6 +245,12 @@ function ShopContent() {
   }
 
   function handleAddToCart(selection: ProductSelection) {
+    if (!session) {
+      savePendingCartAction({ action: "addToCart", selection });
+      setProductModalOpen(false);
+      setLoginModalOpen(true);
+      return;
+    }
     addToCart(selection);
     setProductModalOpen(false);
     setCartToast(true);
@@ -279,7 +287,7 @@ function ShopContent() {
             <h1 className="text-3xl lg:text-4xl font-bold text-black dark:text-white mb-2 font-bengali">
               সব প্রোডাক্ট
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 font-bengali">
+            <p className="text-black/70 dark:text-white/70 font-bengali">
               ES FITT-এর প্রিমিয়াম কালেকশন ব্রাউজ করুন
             </p>
           </div>
@@ -292,9 +300,9 @@ function ShopContent() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="প্রোডাক্ট খুঁজুন..."
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 dark:border-[#1a1a1a] bg-gray-50 dark:bg-[#111] text-sm text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none transition-colors focus:border-accent-teal font-bengali"
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-black/10 dark:border-white/10 bg-white dark:bg-black text-sm text-black dark:text-white placeholder:text-black/40 dark:placeholder:text-white/50 outline-none transition-colors focus:border-accent-teal font-bengali"
               />
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black/40 dark:text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </form>
@@ -305,7 +313,7 @@ function ShopContent() {
                   setSort(e.target.value);
                   setPage(1);
                 }}
-                className="px-4 py-2.5 rounded-lg border border-gray-200 dark:border-[#1a1a1a] bg-gray-50 dark:bg-[#111] text-sm text-black dark:text-white outline-none focus:border-accent-teal font-bengali appearance-none cursor-pointer"
+                className="px-4 py-2.5 rounded-lg border border-black/10 dark:border-white/10 bg-white dark:bg-black text-sm text-black dark:text-white outline-none focus:border-accent-teal font-bengali appearance-none cursor-pointer"
               >
                 {SORT_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -315,7 +323,7 @@ function ShopContent() {
               </select>
               <button
                 onClick={() => setMobileFilterOpen(!mobileFilterOpen)}
-                className="lg:hidden px-4 py-2.5 rounded-lg border border-gray-200 dark:border-[#1a1a1a] bg-gray-50 dark:bg-[#111] text-sm text-black dark:text-white"
+                className="lg:hidden px-4 py-2.5 rounded-lg border border-black/10 dark:border-white/10 bg-white dark:bg-black text-sm text-black dark:text-white"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -327,7 +335,7 @@ function ShopContent() {
           <div className="lg:grid lg:grid-cols-[220px_1fr] lg:gap-8">
             {/* Sidebar Filters */}
             <aside className={`${mobileFilterOpen ? "block" : "hidden"} lg:block mb-6 lg:mb-0`}>
-              <div className="rounded-2xl border border-gray-200 dark:border-[#1a1a1a] bg-white dark:bg-[#0a0a0a] p-5">
+              <div className="rounded-2xl border border-black/10 dark:border-white/10 bg-white dark:bg-black p-5">
                 <h3 className="text-sm font-bold text-black dark:text-white mb-4 font-bengali">ক্যাটাগরি</h3>
                 <div className="space-y-2">
                   <button
@@ -335,7 +343,7 @@ function ShopContent() {
                     className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors font-bengali ${
                       !category
                         ? "bg-accent-teal/10 text-accent-teal font-medium"
-                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#111]"
+                        : "text-black/70 dark:text-white/70 hover:bg-black/5 dark:hover:bg-white/10"
                     }`}
                   >
                     সব পণ্য
@@ -347,7 +355,7 @@ function ShopContent() {
                       className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
                         category === cat
                           ? "bg-accent-teal/10 text-accent-teal font-medium"
-                          : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#111]"
+                          : "text-black/70 dark:text-white/70 hover:bg-black/5 dark:hover:bg-white/10"
                       }`}
                     >
                       {cat}
@@ -385,12 +393,12 @@ function ShopContent() {
               )}
 
               {!loading && !error && products.length === 0 && (
-                <div className="rounded-2xl border border-gray-200 dark:border-[#222222] bg-gray-50 dark:bg-[#0a0a0a] p-12 text-center">
-                  <svg className="mx-auto mb-4 w-12 h-12 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="rounded-2xl border border-black/10 dark:border-white/10 bg-white dark:bg-black p-12 text-center">
+                  <svg className="mx-auto mb-4 w-12 h-12 text-black/10 dark:text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
-                  <p className="text-gray-600 dark:text-gray-400 font-bengali mb-2">কোনো পণ্য পাওয়া যায়নি</p>
-                  <p className="text-sm text-gray-400 dark:text-gray-500 font-bengali">
+                  <p className="text-black/70 dark:text-white/70 font-bengali mb-2">কোনো পণ্য পাওয়া যায়নি</p>
+                  <p className="text-sm text-black/50 dark:text-white/60 font-bengali">
                     অন্য কীওয়ার্ড বা ক্যাটাগরি দিয়ে চেষ্টা করুন
                   </p>
                 </div>
@@ -399,7 +407,7 @@ function ShopContent() {
               {!loading && !error && products.length > 0 && (
                 <>
                   {pagination && (
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 font-bengali">
+                    <p className="text-sm text-black/60 dark:text-white/70 mb-4 font-bengali">
                       মোট {pagination.total}টি পণ্য
                     </p>
                   )}
@@ -419,7 +427,7 @@ function ShopContent() {
                       <button
                         disabled={page <= 1}
                         onClick={() => setPage((p) => Math.max(1, p - 1))}
-                        className="px-4 py-2 rounded-lg border border-gray-200 dark:border-[#1a1a1a] text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#111] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                        className="px-4 py-2 rounded-lg border border-black/10 dark:border-white/10 text-sm text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                       >
                         ← আগে
                       </button>
@@ -442,7 +450,7 @@ function ShopContent() {
                               className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${
                                 page === pageNum
                                   ? "bg-accent-teal text-white"
-                                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#111]"
+                                  : "text-black/70 dark:text-white/70 hover:bg-black/5 dark:hover:bg-white/10"
                               }`}
                             >
                               {pageNum}
@@ -453,7 +461,7 @@ function ShopContent() {
                       <button
                         disabled={page >= (pagination?.totalPages ?? 1)}
                         onClick={() => setPage((p) => p + 1)}
-                        className="px-4 py-2 rounded-lg border border-gray-200 dark:border-[#1a1a1a] text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#111] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                        className="px-4 py-2 rounded-lg border border-black/10 dark:border-white/10 text-sm text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                       >
                         পরে →
                       </button>

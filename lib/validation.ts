@@ -59,10 +59,10 @@ export type EmailVerificationData = z.infer<typeof EmailVerificationSchema>;
 // ─── Validation Error Handler ─────────────────────────────────────────────
 
 export function getValidationErrorMessage(
-  error: z.ZodError,
+  error: z.ZodError<unknown>,
 ): Record<string, string> {
   const errors: Record<string, string> = {};
-  error.errors.forEach((err) => {
+  error.issues.forEach((err: z.ZodIssue) => {
     if (err.path.length > 0) {
       const fieldName = err.path[0] as string;
       errors[fieldName] = err.message;

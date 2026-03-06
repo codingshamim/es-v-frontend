@@ -8,7 +8,9 @@ export function Logo() {
             </div>
             <div>
                 <h1 className="text-black dark:text-white font-bold text-lg mb-[-10px]">ES FITT</h1>
-                <span className="text-accent-teal text-[10px] uppercase ">Next Level Tees</span>
+                <span className="text-[10px] uppercase tracking-[0.2em] text-black/70 dark:text-white/70">
+                  Next Level Tees
+                </span>
             </div>
         </Link>
     );

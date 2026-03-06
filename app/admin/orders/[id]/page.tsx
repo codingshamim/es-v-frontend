@@ -12,7 +12,6 @@ import {
 } from "@heroicons/react/24/outline";
 import { InvoicePrintButton } from "@/components/invoice/InvoicePrintButton";
 import type { InvoiceOrder } from "@/components/invoice/InvoicePrintButton";
-import { useRouter } from "next/navigation";
 interface OrderItem {
   product: {
     _id: string;
@@ -146,23 +145,43 @@ function normalizeOrder(raw: Record<string, unknown>): Order {
     _id: String(raw._id),
     orderId: String(raw.orderId ?? ""),
     customer: {
-      _id: user?._id ?? String(raw.user ?? ""),
+      _id: String(user?._id ?? raw.user ?? ""),
       name: user?.name ?? shipping?.name ?? "Unknown",
       email: user?.email ?? shipping?.email ?? "",
       phone: shipping?.phone ?? "",
     },
-    items: items.map((item: Record<string, unknown>) => ({
-      ...item,
-      product: {
-        _id: typeof item.product === "object" && item.product && "_id" in item.product
-          ? String((item.product as { _id: string })._id)
-          : String(item.product ?? ""),
-        name: (item.name as string) ?? (typeof item.product === "object" && item.product && "name" in item.product ? (item.product as { name: string }).name : "Product"),
-        images: (item.image ? [item.image] : (typeof item.product === "object" && item.product && "images" in item.product ? (item.product as { images?: string[] }).images : undefined)) as string[] | undefined,
-      },
-      quantity: (item.quantity as number) ?? 0,
-      price: ((item.unitPrice ?? item.price) as number) ?? 0,
-    })),
+    items: items.map((item: OrderItem) => {
+      const rawImage = (item as unknown as { image?: string }).image;
+      return {
+        ...item,
+        product: {
+          _id:
+            typeof item.product === "object" &&
+            item.product &&
+            "_id" in item.product
+              ? String((item.product as { _id: string })._id)
+              : String(
+                  (item.product as unknown as string | undefined) ?? "",
+                ),
+          name:
+            (item.name as string) ??
+            (typeof item.product === "object" &&
+            item.product &&
+            "name" in item.product
+              ? (item.product as { name: string }).name
+              : "Product"),
+          images: (rawImage
+            ? [rawImage]
+            : typeof item.product === "object" &&
+                item.product &&
+                "images" in item.product
+              ? (item.product as { images?: string[] }).images
+              : undefined) as string[] | undefined,
+        },
+        quantity: (item.quantity as number) ?? 0,
+        price: ((item.unitPrice ?? item.price) as number) ?? 0,
+      };
+    }),
     shippingAddress: {
       name: shipping?.name ?? "",
       phone: shipping?.phone ?? "",
@@ -223,7 +242,6 @@ function orderToInvoiceOrder(o: Order): InvoiceOrder {
 
 export default function OrderDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const id = params?.id as string;
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);

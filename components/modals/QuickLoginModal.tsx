@@ -26,21 +26,28 @@ function FacebookIcon({ className }: { className?: string }) {
   );
 }
 
-const CALLBACK_URL = "/";
-
 type QuickLoginModalProps = {
   open: boolean;
   onClose: () => void;
+  /** URL to redirect to after login (for OAuth). Defaults to current page. */
+  callbackUrl?: string;
 };
 
-export function QuickLoginModal({ open, onClose }: QuickLoginModalProps) {
+export function QuickLoginModal({ open, onClose, callbackUrl }: QuickLoginModalProps) {
   const router = useRouter();
   const [loadingProvider, setLoadingProvider] = useState<"google" | "facebook" | null>(null);
+
+  const redirectUrl =
+    callbackUrl && typeof window !== "undefined"
+      ? callbackUrl
+      : typeof window !== "undefined"
+        ? window.location.href
+        : "/";
 
   const handleGoogleSignIn = async () => {
     setLoadingProvider("google");
     try {
-      await signIn("google", { callbackUrl: CALLBACK_URL, redirect: true });
+      await signIn("google", { callbackUrl: redirectUrl, redirect: true });
     } finally {
       setLoadingProvider(null);
     }
@@ -49,7 +56,7 @@ export function QuickLoginModal({ open, onClose }: QuickLoginModalProps) {
   const handleFacebookSignIn = async () => {
     setLoadingProvider("facebook");
     try {
-      await signIn("facebook", { callbackUrl: CALLBACK_URL, redirect: true });
+      await signIn("facebook", { callbackUrl: redirectUrl, redirect: true });
     } finally {
       setLoadingProvider(null);
     }
@@ -57,7 +64,8 @@ export function QuickLoginModal({ open, onClose }: QuickLoginModalProps) {
 
   const handlePhoneLogin = () => {
     onClose();
-    router.push("/login");
+    const returnUrl = typeof window !== "undefined" ? window.location.href : "/";
+    router.push(`/login?callbackUrl=${encodeURIComponent(returnUrl)}`);
   };
 
   if (!open) return null;

@@ -8,6 +8,7 @@ export const ADMIN_PERMISSIONS = [
   "analytics_access",
   "settings_access",
   "chat_access",
+  "contact_access",
 ] as const;
 
 export type AdminPermission = (typeof ADMIN_PERMISSIONS)[number];
@@ -22,6 +23,7 @@ export const PERMISSION_LABELS: Record<AdminPermission, string> = {
   analytics_access: "এনালিটিক্স",
   settings_access: "সেটিংস",
   chat_access: "লাইভ চ্যাট",
+  contact_access: "কনট্যাক্ট মেসেজ",
 };
 
 export function hasPermission(

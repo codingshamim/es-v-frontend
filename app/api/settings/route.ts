@@ -61,7 +61,7 @@ export async function GET() {
         },
       });
     }
-    const d = doc as Record<string, unknown>;
+    const d = doc as unknown as Record<string, unknown>;
     const data = {
       store: pickStore(d),
       shipping: pickShipping(d),

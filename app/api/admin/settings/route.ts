@@ -78,9 +78,9 @@ export async function GET() {
     let doc = await Settings.findOne().lean();
     if (!doc) {
       const created = await Settings.create({});
-      doc = created.toObject() as Record<string, unknown>;
+      doc = created.toObject();
     }
-    const d = doc as Record<string, unknown>;
+    const d = doc as unknown as Record<string, unknown>;
 
     const data = {
       store: pickStore(d),
@@ -168,11 +168,12 @@ export async function PUT(req: NextRequest) {
     }
 
     const fresh = (await Settings.findById(doc._id).lean()) ?? doc.toObject();
+    const freshPlain = fresh as unknown as Record<string, unknown>;
     const data = {
-      store: pickStore(fresh as Record<string, unknown>),
-      shipping: pickShipping(fresh as Record<string, unknown>),
-      payment: pickPayment(fresh as Record<string, unknown>),
-      notifications: pickNotifications(fresh as Record<string, unknown>),
+      store: pickStore(freshPlain),
+      shipping: pickShipping(freshPlain),
+      payment: pickPayment(freshPlain),
+      notifications: pickNotifications(freshPlain),
     };
 
     return Response.json({ success: true, data });

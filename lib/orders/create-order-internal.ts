@@ -154,27 +154,28 @@ export async function createOrderInternal(
       }
     }
 
-    const order = await Order.create(
-      [
+    const orderDoc: Record<string, unknown> = {
+      items,
+      shipping,
+      payment,
+      pricing: { subtotal, discount, deliveryCharge, total },
+      couponCode: data.couponCode?.trim().toUpperCase() || undefined,
+      status: initialStatus,
+      statusHistory: [
         {
-          user: userId ? new mongoose.Types.ObjectId(userId) : null,
-          items,
-          shipping,
-          payment,
-          pricing: { subtotal, discount, deliveryCharge, total },
-          couponCode: data.couponCode?.trim().toUpperCase() || undefined,
           status: initialStatus,
-          statusHistory: [
-            {
-              status: initialStatus,
-              timestamp: new Date(),
-              note: "Order created",
-            },
-          ],
+          timestamp: new Date(),
+          note: "Order created",
         },
       ],
-      { session: dbSession }
-    );
+    };
+
+    if (userId) {
+      (orderDoc as { user?: mongoose.Types.ObjectId }).user =
+        new mongoose.Types.ObjectId(userId);
+    }
+
+    const order = await Order.create([orderDoc], { session: dbSession });
 
     await dbSession.commitTransaction();
     dbSession.endSession();

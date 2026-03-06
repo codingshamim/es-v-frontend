@@ -31,7 +31,10 @@ function normalizeMessages(data: { messages?: ChatMessage[]; message?: ChatMessa
       sender: m.sender,
       senderName: m.senderName ?? (m.sender === "admin" ? "Support" : "You"),
       message: m.message,
-      timestamp: typeof m.timestamp === "string" ? m.timestamp : (m.timestamp as Date)?.toISO?.() ?? new Date().toISOString(),
+      timestamp:
+        typeof m.timestamp === "string"
+          ? m.timestamp
+          : (m.timestamp as Date)?.toISOString?.() ?? new Date().toISOString(),
       read: m.read ?? false,
     }));
   }
@@ -42,7 +45,10 @@ function normalizeMessages(data: { messages?: ChatMessage[]; message?: ChatMessa
       sender: m.sender,
       senderName: m.senderName ?? "You",
       message: m.message,
-      timestamp: typeof m.timestamp === "string" ? m.timestamp : (m.timestamp as Date)?.toISO?.() ?? new Date().toISOString(),
+      timestamp:
+        typeof m.timestamp === "string"
+          ? m.timestamp
+          : (m.timestamp as Date)?.toISOString?.() ?? new Date().toISOString(),
       read: m.read ?? false,
     }];
   }
@@ -81,12 +87,52 @@ export default function LiveChatWidget() {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
+  // Listen for contact form submissions and mirror them into chat view
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const custom = event as CustomEvent<{
+        id: string;
+        name: string;
+        phone: string;
+        email?: string;
+        topic: string;
+        message: string;
+        createdAt: string;
+      }>;
+      if (!custom.detail) return;
+      const payload = custom.detail;
+      setMessages((prev) => [
+        ...prev,
+        {
+          _id: payload.id,
+          sender: "customer",
+          senderName: payload.name || "You",
+          message: payload.message,
+          timestamp: payload.createdAt,
+          read: true,
+        },
+      ]);
+      setHasUnread(true);
+    };
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("esfitt-contact-message", handler as EventListener);
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener(
+          "esfitt-contact-message",
+          handler as EventListener,
+        );
+      }
+    };
+  }, []);
+
   useEffect(() => {
     if (!isOpen) return;
 
     const socket = connectSocket();
     socketRef.current = socket;
-    setSocketConnected(socket.connected);
 
     socket.on("connect", () => {
       setSocketConnected(true);
@@ -95,20 +141,26 @@ export default function LiveChatWidget() {
     socket.on("connect_error", () => setSocketConnected(false));
 
     if (isLoggedIn) {
-      setIsConnecting(true);
-      fetch("/api/chat/my-conversation")
-        .then((res) => res.json())
-        .then((data) => {
+      (async () => {
+        setIsConnecting(true);
+        try {
+          const res = await fetch("/api/chat/my-conversation");
+          const data = await res.json();
           if (data.success && data.data) {
             const conv: Conversation = data.data;
             setConversationId(conv._id);
-            setMessages(normalizeMessages({ messages: conv.messages ?? [] }));
+            setMessages(
+              normalizeMessages({ messages: conv.messages ?? [] }),
+            );
             setIsClosed(conv.status === "closed");
             socket.emit("join-conversation", conv._id);
           }
-        })
-        .catch(() => {})
-        .finally(() => setIsConnecting(false));
+        } catch {
+          // ignore fetch errors here; widget will just start empty
+        } finally {
+          setIsConnecting(false);
+        }
+      })();
     }
 
     socket.on("new-message", (payload: { message?: ChatMessage; conversationId?: string } | ChatMessage) => {
@@ -121,9 +173,14 @@ export default function LiveChatWidget() {
       const normalized: ChatMessage = {
         _id: msg._id != null ? String(msg._id) : `m-${Date.now()}`,
         sender: msg.sender,
-        senderName: msg.senderName ?? (msg.sender === "admin" ? "Support" : "You"),
+        senderName:
+          msg.senderName ?? (msg.sender === "admin" ? "Support" : "You"),
         message: msg.message,
-        timestamp: typeof msg.timestamp === "string" ? msg.timestamp : (msg.timestamp as Date)?.toISO?.() ?? new Date().toISOString(),
+        timestamp:
+          typeof msg.timestamp === "string"
+            ? msg.timestamp
+            : (msg.timestamp as Date)?.toISOString?.() ??
+              new Date().toISOString(),
         read: msg.read ?? false,
       };
       setMessages((prev) => {

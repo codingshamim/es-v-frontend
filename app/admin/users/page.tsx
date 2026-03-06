@@ -23,6 +23,7 @@ const PERMISSIONS = [
   { key: "analytics_access", label: "Analytics" },
   { key: "settings_access", label: "Settings" },
   { key: "chat_access", label: "Live Chat" },
+  { key: "contact_access", label: "Contact Messages" },
 ];
 
 interface User {

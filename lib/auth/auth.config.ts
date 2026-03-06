@@ -135,25 +135,39 @@ export const authConfig: NextAuthConfig = {
             family_name?: string;
             picture?: string;
           };
-          const profileEmail =
-            p?.email ?? user.email ?? "";
+
+          const rawEmail = (p?.email || user.email || "").trim().toLowerCase();
+          if (!rawEmail) {
+            console.warn("[auth] OAuth signIn: missing email from provider", {
+              provider: account.provider,
+              hasProfileEmail: !!p?.email,
+              hasUserEmail: !!user.email,
+            });
+            return false;
+          }
+
           const profileName =
-            user.name ||
-            p?.name ||
-            [p?.given_name, p?.family_name].filter(Boolean).join(" ") ||
-            "User";
+            (
+              user.name ||
+              p?.name ||
+              [p?.given_name, p?.family_name].filter(Boolean).join(" ")
+            ).trim() || "User";
+
           const result = await socialLoginOrRegister(
             account.provider as "google" | "facebook",
             {
               id: account.providerAccountId,
               name: profileName,
-              email: profileEmail,
-              image: user.image ?? p?.picture,
+              email: rawEmail,
+              image: user.image ?? p?.picture ?? null,
             },
           );
-
+          console.log(result);
           if (!result.success) {
-            console.error("[auth] OAuth save failed:", result.message);
+            console.error("[auth] OAuth save failed:", {
+              provider: account.provider,
+              message: result.message,
+            });
             return false;
           }
 
@@ -161,7 +175,9 @@ export const authConfig: NextAuthConfig = {
           if (result.user) {
             user.id = result.user.id;
             (user as any).role = result.user.role;
-            if (result.user.phone !== undefined) (user as any).phone = result.user.phone;
+            if (result.user.phone !== undefined) {
+              (user as any).phone = result.user.phone;
+            }
           }
         } catch (err) {
           console.error("[auth] OAuth signIn callback error:", err);
@@ -175,7 +191,10 @@ export const authConfig: NextAuthConfig = {
     async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
-        token.role = ((user as any).role || "user") as "user" | "admin" | "moderator";
+        token.role = ((user as any).role || "user") as
+          | "user"
+          | "admin"
+          | "moderator";
         token.email = user.email ?? undefined;
         token.phone = (user as any).phone ?? undefined;
         // Plain array only - Mongoose arrays cause DataCloneError in JWT encode

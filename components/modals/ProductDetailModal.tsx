@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import Image from "next/image";
 import { CloseIcon } from "@/components/icons";
-import type { Product } from "@/lib/types";
+import type { Product, ProductColor } from "@/lib/types";
 
 export interface ProductSelection {
   productId: string;
@@ -39,16 +39,6 @@ export function ProductDetailModal({
   const [selectedColorName, setSelectedColorName] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
   const [validationMsg, setValidationMsg] = useState("");
-
-  useEffect(() => {
-    if (open) {
-      setSelectedSize("");
-      setSelectedColor("");
-      setSelectedColorName("");
-      setQuantity(1);
-      setValidationMsg("");
-    }
-  }, [open]);
 
   const buildSelection = useCallback((): ProductSelection => ({
     productId: product.id,

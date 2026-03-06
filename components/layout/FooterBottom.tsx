@@ -6,8 +6,8 @@ interface FooterLink {
 }
 
 const footerLinks: FooterLink[] = [
-  { text: 'Privacy Policy', href: '#' },
-  { text: 'Terms of Service', href: '#' },
+  { text: 'Privacy Policy', href: '/privacy-policy' },
+  { text: 'Terms & Conditions', href: '/terms-and-conditions' },
 ];
 
 export function FooterBottom() {

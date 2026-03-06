@@ -1,7 +1,7 @@
 "use server";
 
 import { connectDB } from "@/lib/db/connectDB";
-import User, { UserRole } from "@/lib/models/User";
+import User, { UserRole, type IUser } from "@/lib/models/User";
 
 export interface SocialLoginResult {
   success: boolean;
@@ -28,11 +28,19 @@ export async function socialLoginOrRegister(
   profile: { id: string; name: string; email: string; image?: string | null },
 ): Promise<SocialLoginResult> {
   try {
-    if (!profile?.id || !profile?.email?.trim()) {
+    await connectDB();
+
+    const socialId = profile.id;
+    const email = sanitizeEmail(profile.email);
+    const name = sanitizeName(profile.name);
+    const image = profile.image?.trim() || undefined;
+    const socialField = provider === "google" ? "googleId" : "facebookId";
+
+    if (!socialId || !email) {
       console.warn("[auth] Social login missing id or email", {
         provider,
-        hasId: !!profile?.id,
-        hasEmail: !!profile?.email,
+        hasId: !!socialId,
+        hasEmail: !!email,
       });
       return {
         success: false,
@@ -40,81 +48,55 @@ export async function socialLoginOrRegister(
       };
     }
 
-    await connectDB();
-
-    const socialId = profile.id;
-    const email = sanitizeEmail(profile.email);
-    const name = sanitizeName(profile.name);
-    const image = profile.image?.trim() || undefined;
-    const queryBySocialId =
-      provider === "google"
-        ? { googleId: socialId }
-        : { facebookId: socialId };
-
-    // 1. Find by social id (existing social-linked user)
-    let user = await User.findOne(queryBySocialId);
-
-    if (user) {
-      user.lastLogin = new Date();
-      await user.save();
-      return {
-        success: true,
-        user: {
-          id: user._id.toString(),
-          email: user.email,
-          name: user.name,
-          role: user.role,
-          phone: user.phone ?? undefined,
-        },
-      };
-    }
-
-    // 2. Find by email (link social id to existing account)
-    user = await User.findOne({ email });
-
-    if (user) {
-      if (provider === "google") user.googleId = socialId;
-      else user.facebookId = socialId;
-      if (image) user.profileImage = image;
-      user.lastLogin = new Date();
-      await user.save();
-      return {
-        success: true,
-        user: {
-          id: user._id.toString(),
-          email: user.email,
-          name: user.name,
-          role: user.role,
-          phone: user.phone ?? undefined,
-        },
-      };
-    }
-
-    // 3. Create new user
-    const newUser = new User({
+    // Single upsert that:
+    // - Finds by social id or email
+    // - Links social id if email exists
+    // - Creates new user if none
+    const update: Partial<IUser> = {
       name,
       email,
+      // IUser.profileImage is typed as string | undefined, so avoid null here
+      profileImage: image ?? undefined,
+      isEmailVerified: true,
+      isActive: true,
+      lastLogin: new Date(),
       ...(provider === "google"
         ? { googleId: socialId }
         : { facebookId: socialId }),
-      profileImage: image ?? null,
-      role: UserRole.USER,
-      isEmailVerified: true,
-      isPhoneVerified: false,
-      isActive: true,
-      lastLogin: new Date(),
-    });
+    };
 
-    await newUser.save();
+    const user = await User.findOneAndUpdate(
+      {
+        $or: [{ [socialField]: socialId }, { email }],
+      },
+      {
+        $set: update,
+        $setOnInsert: {
+          role: UserRole.USER,
+          isPhoneVerified: false,
+        },
+      },
+      {
+        new: true,
+        upsert: true,
+      },
+    );
+
+    if (!user) {
+      return {
+        success: false,
+        message: "সামাজিক লগইনে ত্রুটি হয়েছে। অনুগ্রহ করে পুনরায় চেষ্টা করুন।",
+      };
+    }
 
     return {
       success: true,
       user: {
-        id: newUser._id.toString(),
-        email: newUser.email,
-        name: newUser.name,
-        role: newUser.role,
-        phone: newUser.phone ?? undefined,
+        id: user._id.toString(),
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        phone: user.phone ?? undefined,
       },
     };
   } catch (error) {

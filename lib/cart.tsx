@@ -44,26 +44,22 @@ function generateCartItemId(productId: string, size: string, color: string) {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([]);
-  const [hydrated, setHydrated] = useState(false);
+  const [items, setItems] = useState<CartItem[]>(() => {
+    if (typeof window === "undefined") return [];
+    const saved = window.localStorage.getItem(STORAGE_KEY);
+    if (!saved) return [];
+    try {
+      return JSON.parse(saved) as CartItem[];
+    } catch {
+      window.localStorage.removeItem(STORAGE_KEY);
+      return [];
+    }
+  });
 
   useEffect(() => {
-    setHydrated(true);
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        setItems(JSON.parse(saved) as CartItem[]);
-      } catch {
-        localStorage.removeItem(STORAGE_KEY);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    if (hydrated) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    }
-  }, [items, hydrated]);
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  }, [items]);
 
   const addToCart = useCallback((input: AddToCartInput) => {
     const cartItemId = generateCartItemId(input.productId, input.size, input.color);

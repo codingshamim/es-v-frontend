@@ -41,6 +41,33 @@ const notificationsSchema = new Schema(
   { _id: false },
 );
 
+const contactQuickSchema = new Schema(
+  {
+    phone: { type: String, default: "+880 1816628413", trim: true },
+    phoneHours: { type: String, default: "প্রতিদিন সকাল ১০টা – রাত ১০টা", trim: true },
+    trackOrderText: { type: String, default: "আপনার অর্ডার স্ট্যাটাস জানতে /track-order ব্যবহার করুন।", trim: true },
+    email: { type: String, default: "contact@esfitt.com", trim: true },
+    emailNote: { type: String, default: "২৪/৭ ইমেইলে মেসেজ করতে পারেন", trim: true },
+  },
+  { _id: false },
+);
+
+const faqItemSchema = new Schema(
+  {
+    question: { type: String, required: true, trim: true },
+    answer: { type: String, required: true, trim: true },
+  },
+  { _id: false },
+);
+
+const contactSchema = new Schema(
+  {
+    quickContact: { type: contactQuickSchema, default: () => ({}) },
+    faqs: { type: [faqItemSchema], default: () => [] },
+  },
+  { _id: false },
+);
+
 export interface ISettings {
   store: {
     storeName: string;
@@ -67,6 +94,16 @@ export interface ISettings {
     lowStockNotification: boolean;
     newReviewNotification: boolean;
   };
+  contact?: {
+    quickContact: {
+      phone: string;
+      phoneHours: string;
+      trackOrderText: string;
+      email: string;
+      emailNote: string;
+    };
+    faqs: Array<{ question: string; answer: string }>;
+  };
   updatedAt?: Date;
 }
 
@@ -80,6 +117,7 @@ const SettingsSchema = new Schema<ISettingsDocument, ISettingsModel>(
     shipping: { type: shippingSchema, default: () => ({}) },
     payment: { type: paymentSchema, default: () => ({}) },
     notifications: { type: notificationsSchema, default: () => ({}) },
+    contact: { type: contactSchema, default: () => ({ quickContact: {}, faqs: [] }) },
   },
   { timestamps: true },
 );

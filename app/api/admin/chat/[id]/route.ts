@@ -1,6 +1,7 @@
 import { requireAdmin } from "@/lib/admin/auth-check";
 import { connectDB } from "@/lib/db/connectDB";
 import ChatConversation from "@/lib/models/ChatConversation";
+import mongoose from "mongoose";
 import { NextRequest } from "next/server";
 
 export async function GET(
@@ -43,7 +44,7 @@ export async function POST(
 
     const message = {
       sender: "admin" as const,
-      senderId: user!.id,
+      senderId: new mongoose.Types.ObjectId(user!.id),
       senderName: user!.name,
       message: body.message,
       timestamp: new Date(),

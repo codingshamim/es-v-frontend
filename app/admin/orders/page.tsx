@@ -171,23 +171,43 @@ function normalizeOrder(raw: Record<string, unknown>): Order {
     _id: String(raw._id),
     orderId: String(raw.orderId ?? ""),
     customer: {
-      _id: user?._id ?? raw.user ?? "",
+      _id: String(user?._id ?? raw.user ?? ""),
       name: user?.name ?? shipping?.name ?? "Unknown",
       email: user?.email ?? shipping?.email ?? "",
       phone: shipping?.phone ?? "",
     },
-    items: items.map((item: Record<string, unknown>) => ({
-      ...item,
-      product: {
-        _id: typeof item.product === "object" && item.product && "_id" in item.product
-          ? String((item.product as { _id: string })._id)
-          : String(item.product ?? ""),
-        name: (item.name as string) ?? (typeof item.product === "object" && item.product && "name" in item.product ? (item.product as { name: string }).name : "Product"),
-        images: (item.image ? [item.image] : (typeof item.product === "object" && item.product && "images" in item.product ? (item.product as { images?: string[] }).images : undefined)) as string[] | undefined,
-      },
-      quantity: (item.quantity as number) ?? 0,
-      price: ((item.unitPrice ?? item.price) as number) ?? 0,
-    })),
+    items: items.map((item: OrderItem) => {
+      const rawImage = (item as unknown as { image?: string }).image;
+      return {
+        ...item,
+        product: {
+          _id:
+            typeof item.product === "object" &&
+            item.product &&
+            "_id" in item.product
+              ? String((item.product as { _id: string })._id)
+              : String(
+                  (item.product as unknown as string | undefined) ?? "",
+                ),
+          name:
+            (item.name as string) ??
+            (typeof item.product === "object" &&
+            item.product &&
+            "name" in item.product
+              ? (item.product as { name: string }).name
+              : "Product"),
+          images: (rawImage
+            ? [rawImage]
+            : typeof item.product === "object" &&
+                item.product &&
+                "images" in item.product
+              ? (item.product as { images?: string[] }).images
+              : undefined) as string[] | undefined,
+        },
+        quantity: (item.quantity as number) ?? 0,
+        price: ((item.unitPrice ?? item.price) as number) ?? 0,
+      };
+    }),
     shippingAddress: {
       name: shipping?.name ?? "",
       phone: shipping?.phone ?? "",
@@ -751,7 +771,7 @@ export default function OrdersPage() {
                 </InvoicePrintButton>
                 <button
                   onClick={() => openDetail(order)}
-                  className="p-2 rounded-lg border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 text-gray-500 dark:text-gray-400 hover:text-white dark:text-white transition"
+                  className="p-2 rounded-lg border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 text-gray-500 dark:text-white hover:text-white transition"
                   title="View Details"
                 >
                   <EyeIcon className="w-4 h-4" />
@@ -939,7 +959,7 @@ export default function OrdersPage() {
                         </InvoicePrintButton>
                         <button
                           onClick={() => openDetail(order)}
-                          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 dark:text-gray-400 hover:text-white dark:text-white transition"
+                          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 dark:text-white hover:text-white transition"
                           title="View Details"
                         >
                           <EyeIcon className="w-4 h-4" />

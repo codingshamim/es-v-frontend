@@ -187,32 +187,35 @@ export async function createOrder(
         }
       }
 
-      const order = await Order.create(
-        [
+      const orderDoc: Record<string, unknown> = {
+        items,
+        shipping,
+        payment,
+        pricing: {
+          subtotal,
+          discount,
+          deliveryCharge,
+          total,
+        },
+        couponCode: data.couponCode?.trim().toUpperCase() || undefined,
+        status: initialStatus,
+        statusHistory: [
           {
-            user: userId ? new mongoose.Types.ObjectId(userId) : null,
-            items,
-            shipping,
-            payment,
-            pricing: {
-              subtotal,
-              discount,
-              deliveryCharge,
-              total,
-            },
-            couponCode: data.couponCode?.trim().toUpperCase() || undefined,
             status: initialStatus,
-            statusHistory: [
-              {
-                status: initialStatus,
-                timestamp: new Date(),
-                note: "অর্ডার তৈরি হয়েছে",
-              },
-            ],
+            timestamp: new Date(),
+            note: "অর্ডার তৈরি হয়েছে",
           },
         ],
-        { session: dbSession },
-      );
+      };
+
+      if (userId) {
+        (orderDoc as { user?: mongoose.Types.ObjectId }).user =
+          new mongoose.Types.ObjectId(userId);
+      }
+
+      const order = await Order.create([orderDoc], {
+        session: dbSession,
+      });
 
       await dbSession.commitTransaction();
       dbSession.endSession();
@@ -265,7 +268,7 @@ export async function getOrder(orderId: string): Promise<OrderResult> {
     const session = await auth();
     if (session?.user?.id) {
       const isOwner = order.user?.toString() === session.user.id;
-      const isAdmin = (session.user as any).role === "admin";
+      const isAdmin = (session.user as { role?: string }).role === "admin";
       if (order.user && !isOwner && !isAdmin) {
         return { success: false, message: "এই অর্ডার দেখার অনুমতি নেই" };
       }
@@ -483,11 +486,11 @@ export async function getMyOrders(): Promise<{
       .lean();
 
     const data = orders.map((o) => ({
-      _id: (o as any)._id?.toString(),
-      orderId: (o as any).orderId,
-      status: (o as any).status,
-      createdAt: (o as any).createdAt,
-      items: ((o as any).items ?? []).map((it: any) => ({
+      _id: o._id?.toString(),
+      orderId: o.orderId,
+      status: o.status as string,
+      createdAt: o.createdAt?.toISOString?.() ?? String(o.createdAt ?? ""),
+      items: (o.items ?? []).map((it: IOrderItem) => ({
         name: it.name,
         image: it.image,
         size: it.size,
@@ -495,7 +498,7 @@ export async function getMyOrders(): Promise<{
         quantity: it.quantity,
         unitPrice: it.unitPrice,
       })),
-      pricing: (o as any).pricing ?? { total: 0 },
+      pricing: { total: o.pricing?.total ?? 0 },
     }));
 
     return { success: true, data };
