@@ -7,7 +7,7 @@ import { useCart, CartItem } from "@/lib/cart";
 import { Button } from "@/components/ui/Button";
 
 function formatPrice(amount: number) {
-  return `৳${amount.toLocaleString("bn-BD")}`;
+  return `BDT ${amount.toLocaleString("en-US")}`;
 }
 
 function getDiscountPercent(original: number, current: number) {
@@ -62,7 +62,7 @@ function DeleteModal({
             </Button>
             <button
               onClick={onConfirm}
-              className="flex-1 rounded-lg bg-accent-red px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-red-600 font-bengali"
+              className="w-full cursor-pointer rounded-lg bg-accent-red px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-red-600 font-bengali"
             >
               মুছে ফেলুন
             </button>
@@ -119,11 +119,11 @@ function CartItemCard({
               className="object-cover"
               sizes="(max-width: 640px) 96px, 128px"
             />
-            {hasDiscount && (
-              <span className="absolute left-1.5 top-1.5 rounded-md bg-accent-red px-1.5 py-0.5 text-[10px] font-bold text-white">
-                -{discount}%
-              </span>
-            )}
+              {hasDiscount && (
+                <span className="absolute left-1.5 top-1.5 rounded-md bg-accent-red px-1.5 py-0.5 text-[10px] font-bold text-white">
+                  -{discount}%
+                </span>
+              )}
           </div>
         </Link>
 
@@ -148,7 +148,7 @@ function CartItemCard({
                   {formatPrice(item.originalPrice)}
                 </span>
               )}
-              <p className="text-lg font-bold text-accent-teal sm:text-xl">
+              <p className="text-lg font-bold text-black dark:text-white sm:text-xl">
                 {formatPrice(item.unitPrice)}
               </p>
             </div>
@@ -267,12 +267,14 @@ function OrderSummary({
   subtotal,
   savings,
   itemCount,
+  totalQuantity,
   deliveryCharge,
   couponDiscount = 0,
 }: {
   subtotal: number;
   savings: number;
   itemCount: number;
+  totalQuantity: number;
   deliveryCharge: number;
   couponDiscount?: number;
 }) {
@@ -288,7 +290,7 @@ function OrderSummary({
       <div className="space-y-3 text-sm">
         <div className="flex items-center justify-between">
           <span className="text-gray-600 dark:text-gray-400 font-bengali">
-            সাবটোটাল ({itemCount} আইটেম)
+            সাবটোটাল ({itemCount} পণ্য, মোট {totalQuantity} পিস)
           </span>
           <span className="font-medium text-black dark:text-white">
             {formatPrice(subtotal)}
@@ -300,7 +302,7 @@ function OrderSummary({
             <span className="text-gray-600 dark:text-gray-400 font-bengali">
               প্রোডাক্ট ডিসকাউন্ট
             </span>
-            <span className="font-medium text-accent-green">
+            <span className="font-medium text-black dark:text-white">
               -{formatPrice(savings)}
             </span>
           </div>
@@ -311,7 +313,7 @@ function OrderSummary({
             <span className="text-gray-600 dark:text-gray-400 font-bengali">
               কুপন ডিসকাউন্ট
             </span>
-            <span className="font-medium text-accent-green">
+            <span className="font-medium text-black dark:text-white">
               -{formatPrice(couponDiscount)}
             </span>
           </div>
@@ -331,7 +333,7 @@ function OrderSummary({
             <span className="text-base font-bold text-black dark:text-white font-bengali">
               মোট
             </span>
-            <span className="text-xl font-bold text-accent-teal">
+            <span className="text-xl font-bold text-black dark:text-white">
               {formatPrice(total)}
             </span>
           </div>
@@ -339,8 +341,8 @@ function OrderSummary({
       </div>
 
       {totalSavings > 0 && (
-        <div className="mt-4 rounded-xl bg-green-50 dark:bg-green-900/10 border border-green-100 dark:border-green-900/20 px-4 py-2.5 text-center">
-          <p className="text-sm font-semibold text-accent-green font-bengali">
+        <div className="mt-4 rounded-xl bg-black/5 dark:bg-white/10 border border-gray-200 dark:border-[#1a1a1a] px-4 py-2.5 text-center">
+          <p className="text-sm font-semibold text-black dark:text-white font-bengali">
             আপনি সেভ করছেন {formatPrice(totalSavings)}!
           </p>
         </div>
@@ -364,7 +366,7 @@ function OrderSummary({
         <div className="flex flex-col items-center gap-1.5">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-[#111]">
             <svg
-              className="h-5 w-5 text-accent-teal"
+              className="h-5 w-5 text-black dark:text-white"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.5}
@@ -384,7 +386,7 @@ function OrderSummary({
         <div className="flex flex-col items-center gap-1.5">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-[#111]">
             <svg
-              className="h-5 w-5 text-accent-teal"
+              className="h-5 w-5 text-black dark:text-white"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.5}
@@ -404,7 +406,7 @@ function OrderSummary({
         <div className="flex flex-col items-center gap-1.5">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-[#111]">
             <svg
-              className="h-5 w-5 text-accent-teal"
+              className="h-5 w-5 text-black dark:text-white"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.5}
@@ -447,7 +449,8 @@ export default function CartPage() {
 
   const subtotal = getCartTotal();
   const savings = getCartSavings();
-  const itemCount = getCartCount();
+  const totalQuantity = getCartCount();
+  const itemCount = items.length;
   const deliveryCharge = DEFAULT_DELIVERY_CHARGE;
   const couponDiscount = appliedCoupon?.discount ?? 0;
   const total = Math.max(0, subtotal - couponDiscount + deliveryCharge);
@@ -507,14 +510,16 @@ export default function CartPage() {
     <>
       <main className="min-h-[60vh] pb-48 lg:pb-12">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
-          {/* Progress Steps */}
+            {/* Progress Steps */}
           <div className="mb-8 flex items-center justify-center gap-0">
             {/* Step 1 - কার্ট (current) */}
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-teal text-white text-sm font-bold">
-                ১
-              </div>
-              <span className="text-sm font-bold text-accent-teal font-bengali">কার্ট</span>
+                <div className="flex h-8 w-8 items-center dark:bg-white dark:text-black justify-center rounded-full bg-black text-white text-sm font-bold">
+                  ১
+                </div>
+                <span className="text-sm font-bold text-black dark:text-white  font-bengali">
+                  কার্ট
+                </span>
             </div>
 
             <div className="mx-3 h-px w-12 bg-gray-300 dark:bg-gray-600 sm:w-20" />
@@ -599,7 +604,7 @@ export default function CartPage() {
                           setCouponError("");
                         }}
                         placeholder="কুপন কোড লিখুন"
-                        className="flex-1 rounded-lg border border-gray-200 dark:border-[#1a1a1a] bg-gray-50 dark:bg-[#111] px-4 py-2.5 text-sm text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none transition-colors focus:border-accent-teal font-bengali"
+                        className="flex-1 rounded-lg border border-gray-200 dark:border-[#1a1a1a] bg-gray-50 dark:bg-[#111] px-4 py-2.5 text-sm text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none transition-colors focus:border-black/40 dark:focus:border-white/40 font-bengali"
                       />
                       <Button
                         variant="secondary"
@@ -628,6 +633,7 @@ export default function CartPage() {
                   subtotal={subtotal}
                   savings={savings}
                   itemCount={itemCount}
+                  totalQuantity={totalQuantity}
                   deliveryCharge={deliveryCharge}
                   couponDiscount={couponDiscount}
                 />
@@ -644,11 +650,11 @@ export default function CartPage() {
             <p className="text-xs text-gray-500 dark:text-gray-400 font-bengali">
               মোট
             </p>
-            <p className="text-lg font-bold text-accent-teal">
+            <p className="text-lg font-bold text-black dark:text-white">
               {formatPrice(total)}
             </p>
             {savings + couponDiscount > 0 && (
-              <p className="text-[10px] text-accent-green font-bengali">
+              <p className="text-[10px] text-gray-600 dark:text-gray-300 font-bengali">
                 সেভ {formatPrice(savings + couponDiscount)}
               </p>
             )}

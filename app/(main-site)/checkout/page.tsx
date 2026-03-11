@@ -17,7 +17,7 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import type { CreateOrderPayload } from "@/app/actions/orders";
 
 function formatPrice(amount: number) {
-  return `৳${amount.toLocaleString("bn-BD")}`;
+  return `BDT ${amount.toLocaleString("en-US")}`;
 }
 
 const DEFAULT_DHAKA = 120;
@@ -293,9 +293,9 @@ export default function CheckoutPage() {
   if (items.length === 0) return null;
 
   const inputClass =
-    "w-full rounded-lg border border-gray-200 dark:border-[#1a1a1a] bg-gray-50 dark:bg-[#111] px-4 py-2.5 text-sm text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none transition-colors focus:border-accent-teal font-bengali";
+    "w-full rounded-lg border border-gray-200 dark:border-[#1a1a1a] bg-gray-50 dark:bg-[#111] px-4 py-2.5 text-sm text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none transition-colors focus:border-black/40 dark:focus:border-white/40 font-bengali";
   const selectClass =
-    "w-full rounded-lg border border-gray-200 dark:border-[#1a1a1a] bg-gray-50 dark:bg-[#111] px-4 py-2.5 text-sm text-black dark:text-white outline-none transition-colors focus:border-accent-teal font-bengali appearance-none cursor-pointer";
+    "w-full rounded-lg border border-gray-200 dark:border-[#1a1a1a] bg-gray-50 dark:bg-[#111] px-4 py-2.5 text-sm text-black dark:text-white outline-none transition-colors focus:border-black/40 dark:focus:border-white/40 font-bengali appearance-none cursor-pointer";
   const labelClass =
     "mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300 font-bengali";
   const errorClass = "mt-1 text-xs text-red-500 font-bengali";
@@ -308,22 +308,22 @@ export default function CheckoutPage() {
           <div className="mb-8 flex items-center justify-center gap-0">
             {/* Step 1 - কার্ট (completed, tab) */}
             <Link href="/cart" className="flex items-center gap-2 rounded-lg transition-colors hover:opacity-80">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-green text-white">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-white">
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                 </svg>
               </div>
-              <span className="text-sm font-medium text-accent-green font-bengali">কার্ট</span>
+              <span className="text-sm font-medium text-black dark:text-white font-bengali">কার্ট</span>
             </Link>
 
-            <div className="mx-3 h-px w-12 bg-accent-green sm:w-20" />
+            <div className="mx-3 h-px w-12 bg-black/20 dark:bg-white/20 sm:w-20" />
 
             {/* Step 2 - চেকআউট (current) */}
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-teal text-white text-sm font-bold">
+              <div className="flex h-8 w-8 items-center justify-center dark:bg-white dark:text-black rounded-full bg-black text-white text-sm font-bold">
                 ২
               </div>
-              <span className="text-sm font-bold text-accent-teal font-bengali">চেকআউট</span>
+              <span className="text-sm font-bold text-black.dark:text-white font-bengali">চেকআউট</span>
             </div>
 
             <div className="mx-3 h-px w-12 bg-gray-300 dark:bg-gray-600 sm:w-20" />
@@ -342,7 +342,7 @@ export default function CheckoutPage() {
             <div
               className={`mb-6 rounded-xl px-4 py-3 text-sm font-bengali ${
                 toast.type === "success"
-                  ? "bg-accent-green/20 text-accent-green border border-accent-green/40"
+                  ? "bg-black/5 dark:bg-white/10 text-black dark:text-white border border-black/10 dark:border-white/10"
                   : "bg-red-500/20 text-red-400 border border-red-500/40"
               }`}
               role="status"
@@ -357,8 +357,8 @@ export default function CheckoutPage() {
               {/* ── 1. Shipping Information ── */}
               <section className="rounded-2xl border border-gray-100 dark:border-[#1a1a1a] bg-white dark:bg-[#0a0a0a] p-5 sm:p-6">
                 <div className="mb-5 flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-teal/10">
-                    <svg className="h-5 w-5 text-accent-teal" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black/5 dark:bg-white/10">
+                    <svg className="h-5 w-5 text-black dark:text-white" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 0 1 15 0Z" />
                     </svg>
@@ -481,8 +481,8 @@ export default function CheckoutPage() {
               {/* ── 2. Payment Method ── */}
               <section className="rounded-2xl border border-gray-100 dark:border-[#1a1a1a] bg-white dark:bg-[#0a0a0a] p-5 sm:p-6">
                 <div className="mb-5 flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-teal/10">
-                    <svg className="h-5 w-5 text-accent-teal" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black/5 dark:bg-white/10">
+                    <svg className="h-5 w-5 text-black dark:text-white" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" />
                     </svg>
                   </div>
@@ -497,7 +497,7 @@ export default function CheckoutPage() {
                   <label
                     className={`flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-colors ${
                       paymentMethod === "cod"
-                        ? "border-accent-teal bg-accent-teal/5 dark:bg-accent-teal/10"
+                        ? "border-black dark:border-white bg-black/5 dark:bg-white/10"
                         : "border-gray-200 dark:border-[#1a1a1a] hover:border-gray-300 dark:hover:border-[#333]"
                     }`}
                   >
@@ -527,7 +527,7 @@ export default function CheckoutPage() {
                         পণ্য হাতে পেয়ে মূল্য পরিশোধ করুন
                       </p>
                     </div>
-                    <div className={`h-5 w-5 shrink-0 rounded-full border-2 ${paymentMethod === "cod" ? "border-accent-teal bg-accent-teal" : "border-gray-300 dark:border-gray-600"} flex items-center justify-center`}>
+                    <div className={`h-5 w-5 shrink-0 rounded-full border-2 ${paymentMethod === "cod" ? "border-black dark:border-white bg-black dark:bg-white" : "border-gray-300 dark:border-gray-600"} flex items-center justify-center`}>
                       {paymentMethod === "cod" && <div className="h-2 w-2 rounded-full bg-white" />}
                     </div>
                   </label>
@@ -538,7 +538,7 @@ export default function CheckoutPage() {
                   <label
                     className={`flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-colors ${
                       paymentMethod === "bkash"
-                        ? "border-accent-teal bg-accent-teal/5 dark:bg-accent-teal/10"
+                        ? "border-black dark:border-white bg-black/5 dark:bg-white/10"
                         : "border-gray-200 dark:border-[#1a1a1a] hover:border-gray-300 dark:hover:border-[#333]"
                     }`}
                   >
@@ -563,7 +563,7 @@ export default function CheckoutPage() {
                         বিকাশ মোবাইল পেমেন্ট
                       </p>
                     </div>
-                    <div className={`h-5 w-5 shrink-0 rounded-full border-2 ${paymentMethod === "bkash" ? "border-accent-teal bg-accent-teal" : "border-gray-300 dark:border-gray-600"} flex items-center justify-center`}>
+                    <div className={`h-5 w-5 shrink-0 rounded-full border-2 ${paymentMethod === "bkash" ? "border-black dark:border-white bg-black dark:bg-white" : "border-gray-300 dark:border-gray-600"} flex items-center justify-center`}>
                       {paymentMethod === "bkash" && <div className="h-2 w-2 rounded-full bg-white" />}
                     </div>
                   </label>
@@ -574,7 +574,7 @@ export default function CheckoutPage() {
                   <label
                     className={`flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-colors ${
                       paymentMethod === "nagad"
-                        ? "border-accent-teal bg-accent-teal/5 dark:bg-accent-teal/10"
+                        ? "border-black dark:border-white bg-black/5 dark:bg-white/10"
                         : "border-gray-200 dark:border-[#1a1a1a] hover:border-gray-300 dark:hover:border-[#333]"
                     }`}
                   >
@@ -599,7 +599,7 @@ export default function CheckoutPage() {
                         নগদ মোবাইল পেমেন্ট
                       </p>
                     </div>
-                    <div className={`h-5 w-5 shrink-0 rounded-full border-2 ${paymentMethod === "nagad" ? "border-accent-teal bg-accent-teal" : "border-gray-300 dark:border-gray-600"} flex items-center justify-center`}>
+                    <div className={`h-5 w-5 shrink-0 rounded-full border-2 ${paymentMethod === "nagad" ? "border-black dark:border-white bg-black dark:bg-white" : "border-gray-300 dark:border-gray-600"} flex items-center justify-center`}>
                       {paymentMethod === "nagad" && <div className="h-2 w-2 rounded-full bg-white" />}
                     </div>
                   </label>
@@ -608,9 +608,9 @@ export default function CheckoutPage() {
                   {/* Rocket */}
                   {paymentOpts.rocket && (
                   <label
-                    className={`flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-colors ${
+                    className={`flex cursor-pointer.items-center gap-4 rounded-xl border p-4 transition-colors ${
                       paymentMethod === "rocket"
-                        ? "border-accent-teal bg-accent-teal/5 dark:bg-accent-teal/10"
+                        ? "border-black dark:border-white bg-black/5 dark:bg-white/10"
                         : "border-gray-200 dark:border-[#1a1a1a] hover:border-gray-300 dark:hover:border-[#333]"
                     }`}
                   >
@@ -635,7 +635,7 @@ export default function CheckoutPage() {
                         রকেট মোবাইল পেমেন্ট
                       </p>
                     </div>
-                    <div className={`h-5 w-5 shrink-0 rounded-full border-2 ${paymentMethod === "rocket" ? "border-accent-teal bg-accent-teal" : "border-gray-300 dark:border-gray-600"} flex items-center justify-center`}>
+                    <div className={`h-5 w-5 shrink-0 rounded-full border-2 ${paymentMethod === "rocket" ? "border-black dark:border-white bg-black dark:bg-white" : "border-gray-300 dark:border-gray-600"} flex items-center justify-center`}>
                       {paymentMethod === "rocket" && <div className="h-2 w-2 rounded-full bg-white" />}
                     </div>
                   </label>
@@ -647,8 +647,8 @@ export default function CheckoutPage() {
               <section className="rounded-2xl border border-gray-100 dark:border-[#1a1a1a] bg-white dark:bg-[#0a0a0a] p-5 sm:p-6">
                 <div className="mb-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-teal/10">
-                      <svg className="h-5 w-5 text-accent-teal" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black/5 dark:bg-white/10">
+                    <svg className="h-5 w-5 text-black dark:text-white" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                       </svg>
                     </div>
@@ -658,7 +658,7 @@ export default function CheckoutPage() {
                   </div>
                   <Link
                     href="/cart"
-                    className="text-xs font-medium text-accent-teal hover:underline font-bengali"
+                    className="text-xs font-medium text-black dark:text-white hover:underline font-bengali"
                   >
                     পরিবর্তন করুন
                   </Link>
@@ -717,7 +717,7 @@ export default function CheckoutPage() {
                         <span className="text-gray-600 dark:text-gray-400 font-bengali">
                           ডিসকাউন্ট
                         </span>
-                        <span className="font-medium text-accent-green">
+                        <span className="font-medium text-black dark:text-white">
                           -{formatPrice(savings)}
                         </span>
                       </div>
@@ -743,7 +743,7 @@ export default function CheckoutPage() {
                         <span className="text-base font-bold text-black dark:text-white font-bengali">
                           সর্বমোট
                         </span>
-                        <span className="text-xl font-bold text-accent-teal">
+                        <span className="text-xl font-bold text-black dark:text-white">
                           {formatPrice(total)}
                         </span>
                       </div>
@@ -790,8 +790,8 @@ export default function CheckoutPage() {
                 {/* Delivery info card */}
                 <div className="rounded-2xl border border-gray-100 dark:border-[#1a1a1a] bg-white dark:bg-[#0a0a0a] p-4">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-accent-teal/10">
-                      <svg className="h-4.5 w-4.5 text-accent-teal" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-black/5 dark:bg-white/10">
+                      <svg className="h-4.5 w-4.5 text-black dark:text-white" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
                       </svg>
                     </div>
@@ -818,7 +818,7 @@ export default function CheckoutPage() {
             <p className="text-xs text-gray-500 dark:text-gray-400 font-bengali">
               সর্বমোট
             </p>
-            <p className="text-lg font-bold text-accent-teal">
+            <p className="text-lg font-bold text-black dark:text-white">
               {formatPrice(total)}
             </p>
           </div>
@@ -893,8 +893,8 @@ export default function CheckoutPage() {
                 <span className="font-medium text-black dark:text-white">{formatPrice(subtotal)}</span>
               </div>
               <div className="flex justify-between text-base pt-2 border-t border-gray-200 dark:border-[#1a1a1a]">
-                <span className="font-bold text-black dark:text-white font-bengali">সর্বমোট</span>
-                <span className="text-xl font-bold text-accent-teal">{formatPrice(total)}</span>
+                <span className="font-bold text-black.dark:text-white font-bengali">সর্বমোট</span>
+                <span className="text-xl font-bold text-black dark:text-white">{formatPrice(total)}</span>
               </div>
             </div>
             <div className="flex gap-3">

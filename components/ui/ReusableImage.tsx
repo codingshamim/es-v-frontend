@@ -153,7 +153,7 @@ export function ReusableImage({
           )}
 
           {overlayBadges?.topRight && (
-            <div className="absolute top-4 right-4 bg-black/70 text-accent-teal text-xs px-2 py-1 rounded rotate-90 origin-top-right translate-x-full -translate-y-full">
+            <div className="absolute top-4 right-4 bg-black/70 text-white text-xs px-2 py-1 rounded">
               {overlayBadges.topRight}
             </div>
           )}
@@ -172,9 +172,9 @@ export function ReusableImage({
               <button
                 key={actualIndex}
                 onClick={() => selectThumbnail(actualIndex)}
-                className={`w-16 h-16 rounded-lg overflow-hidden border cursor-pointer image-gallery-thumb focus:outline-none focus:ring-2 focus:ring-accent-teal transition-all ${
+                className={`w-16 h-16 rounded-lg overflow-hidden border cursor-pointer image-gallery-thumb focus:outline-none focus:ring-2 focus:ring-black/40 dark:focus:ring-white/40 transition-all ${
                   isSelected
-                    ? "border-accent-teal opacity-100"
+                    ? "border-black dark:border-white opacity-100"
                     : "border-transparent opacity-60 hover:opacity-100"
                 }`}
                 aria-label={`View image ${actualIndex + 1}`}

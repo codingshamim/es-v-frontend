@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { Spinner } from "@/components/ui/Spinner";
 import { Button } from "@/components/ui/Button";
 import { useCart } from "@/lib/cart";
@@ -16,6 +15,7 @@ import {
 } from "@/components/modals";
 import { savePendingCartAction } from "@/lib/pending-cart-action";
 import type { ProductColor, ProductSize } from "@/lib/types";
+import { ReusableImage } from "@/components/ui/ReusableImage";
 
 interface ShopProduct {
   _id: string;
@@ -69,29 +69,30 @@ function ProductCard({
   return (
     <div className="group h-full bg-white dark:bg-black rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 transition-all hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-white/5 flex flex-col">
       <Link href={`/products/${product.slug}`} className="block">
-        <div className="relative aspect-square overflow-hidden">
-          <Image
-            src={product.images.main}
-            alt={product.name}
-            fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          />
-          {isOutOfStock && (
-            <div className="absolute top-3 left-3">
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-black/80 text-white">
-                Out of Stock
-              </span>
-            </div>
-          )}
-          {!isOutOfStock && product.pricing.discount > 0 && (
-            <div className="absolute top-3 left-3">
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-500 text-white">
-                -{product.pricing.discount}%
-              </span>
-            </div>
-          )}
-        </div>
+        <ReusableImage
+          mainSrc={product.images.main}
+          mainAlt={product.name}
+          thumbnails={[]}
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          containerClassName="relative aspect-square overflow-hidden bg-gray-100 dark:bg-black"
+          className=""
+          overlayBadges={{
+            topLeft: (
+              <>
+                {isOutOfStock && (
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold.bg-black/80 text-white">
+                    Out of Stock
+                  </span>
+                )}
+                {!isOutOfStock && product.pricing.discount > 0 && (
+                  <span className="mt-1 inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-500 text-white">
+                    -{product.pricing.discount}%
+                  </span>
+                )}
+              </>
+            ),
+          }}
+        />
       </Link>
       <div className="p-4 flex-1 flex flex-col">
         <Link href={`/products/${product.slug}`}>
@@ -114,9 +115,13 @@ function ProductCard({
         )}
         <div className="flex items-center gap-2 mb-3">
           {product.pricing.salePrice && (
-            <span className="text-xs text-gray-400 line-through">৳{product.pricing.regularPrice}</span>
+            <span className="text-xs text-gray-400 line-through">
+              BDT {product.pricing.regularPrice}
+            </span>
           )}
-          <span className="text-base font-bold text-black dark:text-white">৳{currentPrice}</span>
+          <span className="text-base font-bold text-black dark:text-white">
+            BDT {currentPrice}
+          </span>
         </div>
         <button
           disabled={isOutOfStock}

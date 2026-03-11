@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import Image from "next/image";
 import { CloseIcon } from "@/components/icons";
 import type { Product, ProductColor } from "@/lib/types";
+import { ReusableImage } from "@/components/ui/ReusableImage";
 
 export interface ProductSelection {
   productId: string;
@@ -114,25 +114,25 @@ export function ProductDetailModal({
         <div className="p-4 space-y-5">
           {/* Product Info */}
           <div className="flex items-start gap-4">
-            <div className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-gray-100 dark:bg-gray-800">
-              <Image
-                src={product.image}
-                alt={product.name}
-                fill
-                className="object-cover"
-                sizes="80px"
-              />
-            </div>
+            <ReusableImage
+              mainSrc={product.image}
+              mainAlt={product.name}
+              thumbnails={[]}
+              sizes="80px"
+              containerClassName="relative w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-gray-100 dark:bg-gray-800"
+              className=""
+              thumbnailClassName="w-20 h-20 shrink-0"
+            />
             <div className="min-w-0 flex-1">
               <h3 className="text-base font-semibold text-gray-900 dark:text-white line-clamp-2 font-bengali">
                 {product.name}
               </h3>
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-sm text-gray-400 line-through">
-                  ৳{product.originalPrice}
+                  BDT {product.originalPrice}
                 </span>
                 <span className="text-lg font-bold text-gray-900 dark:text-white">
-                  ৳{product.currentPrice}
+                  BDT {product.currentPrice}
                 </span>
               </div>
             </div>

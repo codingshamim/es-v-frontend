@@ -529,37 +529,7 @@ function CodFlow({
         </div>
       )}
 
-      {/* Confirm COD button - বিকল্প: ডেলিভারি চার্জ অনলাইনে না দিলে */}
-      {!selectedOnlineMethod && (
-        <div className="rounded-2xl border border-gray-200 dark:border-[#1a1a1a] bg-white dark:bg-[#0a0a0a] p-5">
-          <div className="mb-4 p-4 rounded-xl bg-gray-50 dark:bg-[#111] border border-gray-100 dark:border-[#1a1a1a]">
-            <p className="text-sm text-gray-700 dark:text-gray-300 font-bengali">
-              <strong>বিকল্প:</strong> ডেলিভারি চার্জ এখনই অনলাইনে না দিলে, নিচে ক্লিক করে অর্ডার নিশ্চিত করুন।
-              ডেলিভারির সময় ডেলিভারি চার্জসহ সাবটোটাল মোট টাকা নগদ পরিশোধ করবেন।
-            </p>
-          </div>
-          {error && (
-            <p className="mb-4 rounded-lg bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 px-4 py-2.5 text-sm text-center text-red-600 dark:text-red-400 font-bengali" role="alert">
-              {error}
-            </p>
-          )}
-          <button
-            type="button"
-            onClick={handleConfirmCod}
-            disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-black dark:bg-white px-6 py-4 text-base font-semibold text-white dark:text-black transition-all hover:bg-[#1a1a1a]/80 dark:hover:bg-white/80 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60 font-bengali"
-          >
-            {loading ? (
-              <>
-                <Spinner size="md" className="text-white dark:text-black" />
-                নিশ্চিত হচ্ছে...
-              </>
-            ) : (
-              "ডেলিভারিতে সব টাকা দেব — অর্ডার নিশ্চিত করুন"
-            )}
-          </button>
-        </div>
-      )}
+      
     </div>
   );
 }

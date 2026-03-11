@@ -23,8 +23,17 @@ export const metadata: Metadata = {
     default: "ES FITT - Next Level Tees | Premium T-Shirts",
     template: "%s | ES FITT",
   },
-  description: "ES FITT offers premium quality t-shirts with modern designs. Shop the latest collection of comfortable, stylish tees. Free delivery available.",
-  keywords: ["t-shirts", "premium t-shirts", "ES FITT", "fashion", "clothing", "bangladesh", "online shopping"],
+  description:
+    "ES FITT offers premium quality t-shirts with modern designs. Shop the latest collection of comfortable, stylish tees. Free delivery available.",
+  keywords: [
+    "t-shirts",
+    "premium t-shirts",
+    "ES FITT",
+    "fashion",
+    "clothing",
+    "bangladesh",
+    "online shopping",
+  ],
   authors: [{ name: "ES FITT" }],
   creator: "ES FITT",
   publisher: "ES FITT",
@@ -43,7 +52,8 @@ export const metadata: Metadata = {
     url: "/",
     siteName: "ES FITT",
     title: "ES FITT - Next Level Tees",
-    description: "Premium quality t-shirts with modern designs. Shop the latest collection.",
+    description:
+      "Premium quality t-shirts with modern designs. Shop the latest collection.",
     images: [
       {
         url: "/og-image.jpg",

@@ -36,7 +36,7 @@ export async function GET() {
         .populate("user", "name email")
         .lean(),
       Order.aggregate([
-        { $match: { status: { $in: ["confirmed", "delivered", "shipped"] } } },
+        { $match: { status: { $in: ["delivered"] } } },
         { $group: { _id: null, totalRevenue: { $sum: "$pricing.total" } } },
       ]),
       Product.find({ status: "Active" })
