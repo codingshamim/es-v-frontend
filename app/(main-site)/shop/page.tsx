@@ -43,6 +43,11 @@ interface Pagination {
   totalPages: number;
 }
 
+interface ShopCategory {
+  name: string;
+  slug: string;
+}
+
 const SORT_OPTIONS = [
   { value: "newest", label: "নতুন প্রথমে" },
   { value: "popular", label: "জনপ্রিয়" },
@@ -62,7 +67,7 @@ function ProductCard({
   const isOutOfStock = product.totalStock === 0 || product.status === "Out of Stock";
 
   return (
-    <div className="group bg-white dark:bg-black rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 transition-all hover:shadow-lg hover:shadow-accent-teal/5">
+    <div className="group h-full bg-white dark:bg-black rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 transition-all hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-white/5 flex flex-col">
       <Link href={`/products/${product.slug}`} className="block">
         <div className="relative aspect-square overflow-hidden">
           <Image
@@ -88,9 +93,9 @@ function ProductCard({
           )}
         </div>
       </Link>
-      <div className="p-4">
+      <div className="p-4 flex-1 flex flex-col">
         <Link href={`/products/${product.slug}`}>
-          <h3 className="font-semibold text-black dark:text-white mb-1 hover:text-accent-teal transition-colors line-clamp-1">
+          <h3 className="font-semibold text-black dark:text-white mb-1 hover:text-black/70 dark:hover:text-white/80 transition-colors line-clamp-1">
             {product.name}
           </h3>
         </Link>
@@ -111,12 +116,12 @@ function ProductCard({
           {product.pricing.salePrice && (
             <span className="text-xs text-gray-400 line-through">৳{product.pricing.regularPrice}</span>
           )}
-          <span className="text-base font-bold text-accent-teal">৳{currentPrice}</span>
+          <span className="text-base font-bold text-black dark:text-white">৳{currentPrice}</span>
         </div>
         <button
           disabled={isOutOfStock}
           onClick={() => onQuickBuy(product)}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-black/10 dark:border-white/10 bg-white dark:bg-black text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-bengali"
+          className="mt-auto w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-black/10 dark:border-white/10 bg-white dark:bg-black text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-bengali"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -153,7 +158,7 @@ function ShopContent() {
   const { addToCart } = useCart();
 
   const [products, setProducts] = useState<ShopProduct[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
+  const [categories, setCategories] = useState<ShopCategory[]>([]);
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -185,7 +190,6 @@ function ShopContent() {
       const json = await res.json();
       if (json.success) {
         setProducts(json.data);
-        setCategories(json.categories || []);
         setPagination(json.pagination);
       } else {
         setError(json.message || "পণ্য লোড করতে ব্যর্থ");
@@ -197,9 +201,39 @@ function ShopContent() {
     }
   }, [page, category, search, sort]);
 
+  const fetchCategories = useCallback(async () => {
+    try {
+      setCategories([]);
+      const res = await fetch("/api/categories", { cache: "no-store" });
+      const json = await res.json();
+      if (json.success) {
+        const list = Array.isArray(json.data) ? (json.data as ShopCategory[]) : [];
+        const normalized = list
+          .filter((c) => c && typeof c.name === "string" && typeof c.slug === "string")
+          .map((c) => ({ name: c.name, slug: c.slug }));
+
+        const seen = new Set<string>();
+        const unique = normalized.filter((c) => {
+          const key = c.slug;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+
+        setCategories(unique);
+      }
+    } catch {
+      // keep sidebar usable even if categories fail
+    }
+  }, []);
+
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -300,7 +334,7 @@ function ShopContent() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="প্রোডাক্ট খুঁজুন..."
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-black/10 dark:border-white/10 bg-white dark:bg-black text-sm text-black dark:text-white placeholder:text-black/40 dark:placeholder:text-white/50 outline-none transition-colors focus:border-accent-teal font-bengali"
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-black/10 dark:border-white/10 bg-white dark:bg-black text-sm text-black dark:text-white placeholder:text-black/40 dark:placeholder:text-white/50 outline-none transition-colors focus:border-black/40 dark:focus:border-white/40 font-bengali"
               />
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black/40 dark:text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -313,7 +347,7 @@ function ShopContent() {
                   setSort(e.target.value);
                   setPage(1);
                 }}
-                className="px-4 py-2.5 rounded-lg border border-black/10 dark:border-white/10 bg-white dark:bg-black text-sm text-black dark:text-white outline-none focus:border-accent-teal font-bengali appearance-none cursor-pointer"
+                className="px-4 py-2.5 rounded-lg border border-black/10 dark:border-white/10 bg-white dark:bg-black text-sm text-black dark:text-white outline-none focus:border-black/40 dark:focus:border-white/40 font-bengali appearance-none cursor-pointer"
               >
                 {SORT_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -342,7 +376,7 @@ function ShopContent() {
                     onClick={() => handleCategoryChange("")}
                     className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors font-bengali ${
                       !category
-                        ? "bg-accent-teal/10 text-accent-teal font-medium"
+                        ? "bg-black/5 dark:bg-white/10 text-black dark:text-white font-medium"
                         : "text-black/70 dark:text-white/70 hover:bg-black/5 dark:hover:bg-white/10"
                     }`}
                   >
@@ -350,15 +384,15 @@ function ShopContent() {
                   </button>
                   {categories.map((cat) => (
                     <button
-                      key={cat}
-                      onClick={() => handleCategoryChange(cat)}
+                      key={cat.slug}
+                      onClick={() => handleCategoryChange(cat.slug)}
                       className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                        category === cat
-                          ? "bg-accent-teal/10 text-accent-teal font-medium"
+                        category === cat.slug
+                          ? "bg-black/5 dark:bg-white/10 text-black dark:text-white font-medium"
                           : "text-black/70 dark:text-white/70 hover:bg-black/5 dark:hover:bg-white/10"
                       }`}
                     >
-                      {cat}
+                      {cat.name}
                     </button>
                   ))}
                 </div>
@@ -449,7 +483,7 @@ function ShopContent() {
                               onClick={() => setPage(pageNum)}
                               className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${
                                 page === pageNum
-                                  ? "bg-accent-teal text-white"
+                                  ? "bg-black text-white dark:bg-white dark:text-black"
                                   : "text-black/70 dark:text-white/70 hover:bg-black/5 dark:hover:bg-white/10"
                               }`}
                             >
@@ -489,7 +523,7 @@ function ShopContent() {
       <QuickLoginModal open={loginModalOpen} onClose={() => setLoginModalOpen(false)} />
 
       {cartToast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-200 px-5 py-3 rounded-xl bg-accent-green text-white text-sm font-semibold font-bengali shadow-lg animate-fade-in-up pointer-events-none">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-200 px-5 py-3 rounded-xl bg-black text-white dark:bg-white dark:text-black text-sm font-semibold font-bengali shadow-lg animate-fade-in-up pointer-events-none">
           কার্টে যোগ করা হয়েছে!
         </div>
       )}
@@ -502,7 +536,7 @@ export default function ShopPage() {
     <Suspense
       fallback={
         <main className="flex min-h-[60vh] items-center justify-center">
-          <Spinner size="lg" className="text-accent-teal" />
+          <Spinner size="lg" className="text-black dark:text-white" />
         </main>
       }
     >

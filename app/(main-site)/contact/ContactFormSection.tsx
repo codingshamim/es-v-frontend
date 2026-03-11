@@ -1,13 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
+
+const RECAPTCHA_SCRIPT_URL = "https://www.google.com/recaptcha/api.js?render=";
 
 export function ContactFormSection() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Load reCAPTCHA v3 when site key is set
+  useEffect(() => {
+    const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+    if (!siteKey || typeof document === "undefined") return;
+    if (document.querySelector(`script[src^="${RECAPTCHA_SCRIPT_URL}"]`)) return;
+    const script = document.createElement("script");
+    script.src = `${RECAPTCHA_SCRIPT_URL}${siteKey}`;
+    script.async = true;
+    document.head.appendChild(script);
+  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -21,17 +34,33 @@ export function ContactFormSection() {
     const email = String(formData.get("email") ?? "").trim();
     const topic = String(formData.get("topic") ?? "").trim() || "other";
     const message = String(formData.get("message") ?? "").trim();
+    const website = String(formData.get("website") ?? "").trim(); // honeypot
 
     if (!name || !phone || !message) {
       setLoading(false);
       return;
+    }
+    if (website) return; // bot trap
+
+    let recaptchaToken: string | undefined;
+    if (typeof window !== "undefined" && (window as unknown as { grecaptcha?: { execute: (siteKey: string, opts: { action: string }) => Promise<string> } }).grecaptcha) {
+      const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+      if (siteKey) {
+        try {
+          recaptchaToken = await (window as unknown as { grecaptcha: { execute: (siteKey: string, opts: { action: string }) => Promise<string> } }).grecaptcha.execute(siteKey, { action: "contact" });
+        } catch {
+          setError("যাচাইকরণ ব্যর্থ। আবার চেষ্টা করুন");
+          setLoading(false);
+          return;
+        }
+      }
     }
 
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, phone, email, topic, message }),
+        body: JSON.stringify({ name, phone, email, topic, message, recaptchaToken }),
       });
 
       const json = await res.json();
@@ -68,7 +97,7 @@ export function ContactFormSection() {
     <section className="rounded-2xl border border-black/10 dark:border-white/10 bg-white dark:bg-black px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8 shadow-[0_18px_60px_rgba(0,0,0,0.08)] dark:shadow-[0_18px_60px_rgba(0,0,0,0.65)]">
       {submitted ? (
         <div className="flex flex-col items-center text-center py-8">
-          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-accent-green/10 text-accent-green">
+          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-black/5 dark:bg-white/10 text-black dark:text-white">
             <svg
               className="h-6 w-6"
               fill="none"
@@ -110,6 +139,11 @@ export function ContactFormSection() {
               {error}
             </div>
           )}
+          {/* Honeypot: hidden from users, bots may fill it */}
+          <div className="absolute -left-[9999px] opacity-0 pointer-events-none" aria-hidden="true">
+            <label htmlFor="website">Website</label>
+            <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label
@@ -123,7 +157,7 @@ export function ContactFormSection() {
                 name="name"
                 type="text"
                 required
-                className="w-full rounded-lg border border-black/10 dark:border-white/15 bg-white dark:bg-black px-3.5 py-2.5 text-sm text-black dark:text-white outline-none placeholder:text-black/35 dark:placeholder:text-white/40 focus:border-accent-teal"
+                className="w-full rounded-lg border border-black/10 dark:border-white/15 bg-white dark:bg-black px-3.5 py-2.5 text-sm text-black dark:text-white outline-none placeholder:text-black/35 dark:placeholder:text-white/40 focus:border-black/40 dark:focus:border-white/40"
                 placeholder="আপনার পূর্ণ নাম"
               />
             </div>
@@ -139,7 +173,7 @@ export function ContactFormSection() {
                 name="phone"
                 type="tel"
                 required
-                className="w-full rounded-lg border border-black/10 dark:border-white/15 bg-white dark:bg-black px-3.5 py-2.5 text-sm text-black dark:text-white outline-none placeholder:text-black/35 dark:placeholder:text-white/40 focus:border-accent-teal"
+                className="w-full rounded-lg border border-black/10 dark:border-white/15 bg-white dark:bg-black px-3.5 py-2.5 text-sm text-black dark:text-white outline-none placeholder:text-black/35 dark:placeholder:text-white/40 focus:border-black/40 dark:focus:border-white/40"
                 placeholder="+8801XXXXXXXXX"
               />
             </div>
@@ -156,7 +190,7 @@ export function ContactFormSection() {
               id="email"
               name="email"
               type="email"
-              className="w-full rounded-lg border border-black/10 dark:border-white/15 bg-white dark:bg-black px-3.5 py-2.5 text-sm text-black dark:text-white outline-none placeholder:text-black/35 dark:placeholder:text-white/40 focus:border-accent-teal"
+              className="w-full rounded-lg border border-black/10 dark:border-white/15 bg-white dark:bg-black px-3.5 py-2.5 text-sm text-black dark:text-white outline-none placeholder:text-black/35 dark:placeholder:text-white/40 focus:border-black/40 dark:focus:border-white/40"
               placeholder="you@example.com"
             />
           </div>
@@ -171,7 +205,7 @@ export function ContactFormSection() {
             <select
               id="topic"
               name="topic"
-              className="w-full rounded-lg border border-black/10 dark:border-white/15 bg-white dark:bg-black px-3.5 py-2.5 text-sm text-black dark:text-white outline-none focus:border-accent-teal font-bengali cursor-pointer"
+              className="w-full rounded-lg border border-black/10 dark:border-white/15 bg-white dark:bg-black px-3.5 py-2.5 text-sm text-black dark:text-white outline-none focus:border-black/40 dark:focus:border-white/40 font-bengali cursor-pointer"
               defaultValue="order"
             >
               <option value="order">অর্ডার সংক্রান্ত প্রশ্ন</option>
@@ -194,7 +228,7 @@ export function ContactFormSection() {
               name="message"
               required
               rows={4}
-              className="w-full rounded-lg border border-black/10 dark:border-white/15 bg-white dark:bg-black px-3.5 py-2.5 text-sm text-black dark:text-white outline-none placeholder:text-black/35 dark:placeholder:text-white/40 focus:border-accent-teal resize-none font-bengali"
+              className="w-full rounded-lg border border-black/10 dark:border-white/15 bg-white dark:bg-black px-3.5 py-2.5 text-sm text-black dark:text-white outline-none placeholder:text-black/35 dark:placeholder:text-white/40 focus:border-black/40 dark:focus:border-white/40 resize-none font-bengali"
               placeholder="আপনার সমস্যাটি বিস্তারিত লিখুন, যেমন অর্ডার আইডি, প্রোডাক্ট নাম ইত্যাদি।"
             />
           </div>

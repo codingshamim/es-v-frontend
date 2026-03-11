@@ -131,7 +131,7 @@ export function ProductDetailModal({
                 <span className="text-sm text-gray-400 line-through">
                   ৳{product.originalPrice}
                 </span>
-                <span className="text-lg font-bold text-accent-teal">
+                <span className="text-lg font-bold text-gray-900 dark:text-white">
                   ৳{product.currentPrice}
                 </span>
               </div>
@@ -164,7 +164,7 @@ export function ProductDetailModal({
                   const v = parseInt(e.target.value, 10);
                   if (!isNaN(v)) setQuantity(Math.max(1, Math.min(10, v)));
                 }}
-                className="w-14 h-9 text-center rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-accent-teal [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                className="w-14 h-9 text-center rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-black/30 dark:focus:ring-white/30 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
               <button
                 type="button"
@@ -190,7 +190,7 @@ export function ProductDetailModal({
                 <button
                   type="button"
                   onClick={onSizeDetailsClick}
-                  className="text-xs text-accent-teal hover:underline font-bengali"
+                  className="text-xs text-gray-700 dark:text-gray-300 hover:underline font-bengali"
                 >
                   সাইজ বিস্তারিত
                 </button>
@@ -211,8 +211,8 @@ export function ProductDetailModal({
                       ${isOutOfStock
                         ? "border-gray-200 dark:border-gray-800 text-gray-300 dark:text-gray-600 cursor-not-allowed line-through"
                         : isSelected
-                          ? "border-accent-teal bg-accent-teal/10 text-accent-teal"
-                          : "border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-accent-teal hover:text-accent-teal"
+                          ? "border-black bg-black/5 text-black dark:border-white dark:bg-white/10 dark:text-white"
+                          : "border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-black hover:text-black dark:hover:border-white dark:hover:text-white"
                       }
                     `}
                   >
@@ -245,7 +245,7 @@ export function ProductDetailModal({
                       className={`
                         w-9 h-9 rounded-full border-2 transition-all
                         ${isSelected
-                          ? "ring-2 ring-accent-teal ring-offset-2 ring-offset-white dark:ring-offset-[#111111] border-transparent"
+                          ? "ring-2 ring-black/60 dark:ring-white/60 ring-offset-2 ring-offset-white dark:ring-offset-[#111111] border-transparent"
                           : "border-gray-200 dark:border-gray-700 hover:scale-110"
                         }
                       `}
@@ -269,7 +269,7 @@ export function ProductDetailModal({
             <button
               type="button"
               onClick={() => handleAction(onBuyNow)}
-              className="flex-1 py-3 rounded-xl text-sm font-semibold border border-accent-teal text-accent-teal hover:bg-accent-teal/10 transition-colors font-bengali disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 py-3 rounded-xl text-sm font-semibold border border-gray-900 text-gray-900 hover:bg-black/5 dark:border-white dark:text-white dark:hover:bg-white/10 transition-colors font-bengali disabled:opacity-50 disabled:cursor-not-allowed"
             >
               এখনই কিনুন
             </button>

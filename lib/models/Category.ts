@@ -14,7 +14,7 @@ export interface ICategory {
 
 export interface ICategoryDocument extends ICategory, Document {}
 
-export interface ICategoryModel extends Model<ICategoryDocument> {}
+export type ICategoryModel = Model<ICategoryDocument>;
 
 const CategorySchema = new Schema<ICategoryDocument, ICategoryModel>(
   {

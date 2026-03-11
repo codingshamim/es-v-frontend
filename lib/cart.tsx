@@ -44,22 +44,33 @@ function generateCartItemId(productId: string, size: string, color: string) {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>(() => {
-    if (typeof window === "undefined") return [];
-    const saved = window.localStorage.getItem(STORAGE_KEY);
-    if (!saved) return [];
-    try {
-      return JSON.parse(saved) as CartItem[];
-    } catch {
-      window.localStorage.removeItem(STORAGE_KEY);
-      return [];
-    }
-  });
+  // Always start with the same value on server and client to avoid hydration mismatches.
+  // Then, after mount, load the persisted cart from localStorage.
+  const [items, setItems] = useState<CartItem[]>([]);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    const saved = window.localStorage.getItem(STORAGE_KEY);
+    if (!saved) {
+      setHydrated(true);
+      return;
+    }
+    try {
+      const parsed = JSON.parse(saved) as CartItem[];
+      if (Array.isArray(parsed)) setItems(parsed);
+    } catch {
+      window.localStorage.removeItem(STORAGE_KEY);
+    } finally {
+      setHydrated(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!hydrated) return;
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  }, [items]);
+  }, [items, hydrated]);
 
   const addToCart = useCallback((input: AddToCartInput) => {
     const cartItemId = generateCartItemId(input.productId, input.size, input.color);

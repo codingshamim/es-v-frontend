@@ -1,7 +1,11 @@
 import { requireAdmin } from "@/lib/admin/auth-check";
 import { connectDB } from "@/lib/db/connectDB";
 import ContactContent from "@/lib/models/ContactContent";
+import { rateLimit, ADMIN_LIMIT } from "@/lib/rate-limit";
+import { logger } from "@/lib/logger";
 import { NextRequest } from "next/server";
+
+const MAX_BODY_BYTES = 200 * 1024; // 200 KB for contact content
 
 const DEFAULT_QUICK = {
   phone: "+880 1816628413",
@@ -61,7 +65,7 @@ export async function GET() {
     const data = pickContact(d);
     return Response.json({ success: true, data });
   } catch (err) {
-    console.error("[admin/contact-content GET]", err);
+    logger.error("Admin contact-content GET failed", { err });
     return Response.json(
       { success: false, message: "Server error" },
       { status: 500 },
@@ -71,8 +75,25 @@ export async function GET() {
 
 export async function PUT(req: NextRequest) {
   try {
-    const { authorized, error } = await requireAdmin("contact_access");
+    const { authorized, error, user } = await requireAdmin("contact_access");
     if (!authorized) return error;
+
+    const rl = rateLimit(`admin:${user!.id}`, ADMIN_LIMIT);
+    if (!rl.success) {
+      return Response.json(
+        { success: false, message: "Too many requests" },
+        { status: 429, headers: { "Retry-After": "60" } },
+      );
+    }
+
+    const contentLength = req.headers.get("content-length");
+    if (contentLength && parseInt(contentLength, 10) > MAX_BODY_BYTES) {
+      return Response.json(
+        { success: false, message: "Request body too large" },
+        { status: 413 },
+      );
+    }
+
     await connectDB();
 
     const body = await req.json();
@@ -144,7 +165,7 @@ export async function PUT(req: NextRequest) {
     const data = pickContact(d);
     return Response.json({ success: true, data });
   } catch (err) {
-    console.error("[admin/contact-content PUT]", err);
+    logger.error("Admin contact-content PUT failed", { err });
     return Response.json(
       { success: false, message: "Server error" },
       { status: 500 },

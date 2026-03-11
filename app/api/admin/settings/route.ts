@@ -69,6 +69,15 @@ function pickNotifications(doc: Record<string, unknown>) {
   };
 }
 
+function pickSocial(doc: Record<string, unknown>) {
+  const s = doc.social as Record<string, unknown> | undefined;
+  return {
+    facebook: String(s?.facebook ?? ""),
+    instagram: String(s?.instagram ?? ""),
+    linkedin: String(s?.linkedin ?? ""),
+  };
+}
+
 export async function GET() {
   try {
     const { authorized, error } = await requireAdmin("settings_access");
@@ -84,6 +93,7 @@ export async function GET() {
 
     const data = {
       store: pickStore(d),
+      social: pickSocial(d),
       shipping: pickShipping(d),
       payment: pickPayment(d),
       notifications: pickNotifications(d),
@@ -124,6 +134,15 @@ export async function PUT(req: NextRequest) {
       };
     }
 
+    // Social – replace entire subdocument
+    if (body.social && typeof body.social === "object") {
+      doc.social = {
+        facebook: String(body.social.facebook ?? "").trim(),
+        instagram: String(body.social.instagram ?? "").trim(),
+        linkedin: String(body.social.linkedin ?? "").trim(),
+      };
+    }
+
     // Shipping – replace entire subdocument
     if (body.shipping && typeof body.shipping === "object") {
       doc.shipping = {
@@ -154,6 +173,7 @@ export async function PUT(req: NextRequest) {
     }
 
     doc.markModified("store");
+    doc.markModified("social");
     doc.markModified("shipping");
     doc.markModified("payment");
     doc.markModified("notifications");
@@ -171,6 +191,7 @@ export async function PUT(req: NextRequest) {
     const freshPlain = fresh as unknown as Record<string, unknown>;
     const data = {
       store: pickStore(freshPlain),
+      social: pickSocial(freshPlain),
       shipping: pickShipping(freshPlain),
       payment: pickPayment(freshPlain),
       notifications: pickNotifications(freshPlain),

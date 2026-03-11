@@ -41,6 +41,15 @@ const notificationsSchema = new Schema(
   { _id: false },
 );
 
+const socialSchema = new Schema(
+  {
+    facebook: { type: String, default: "", trim: true },
+    instagram: { type: String, default: "", trim: true },
+    linkedin: { type: String, default: "", trim: true },
+  },
+  { _id: false },
+);
+
 const contactQuickSchema = new Schema(
   {
     phone: { type: String, default: "+880 1816628413", trim: true },
@@ -74,6 +83,11 @@ export interface ISettings {
     storeEmail: string;
     storePhone: string;
     storeAddress: string;
+  };
+  social?: {
+    facebook: string;
+    instagram: string;
+    linkedin: string;
   };
   shipping: {
     dhakaCharge: number;
@@ -109,11 +123,12 @@ export interface ISettings {
 
 export interface ISettingsDocument extends ISettings, Document {}
 
-export interface ISettingsModel extends Model<ISettingsDocument> {}
+export type ISettingsModel = Model<ISettingsDocument>;
 
 const SettingsSchema = new Schema<ISettingsDocument, ISettingsModel>(
   {
     store: { type: storeSchema, default: () => ({}) },
+    social: { type: socialSchema, default: () => ({}) },
     shipping: { type: shippingSchema, default: () => ({}) },
     payment: { type: paymentSchema, default: () => ({}) },
     notifications: { type: notificationsSchema, default: () => ({}) },

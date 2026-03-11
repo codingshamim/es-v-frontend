@@ -1,12 +1,22 @@
 import { requireAdmin } from "@/lib/admin/auth-check";
 import { connectDB } from "@/lib/db/connectDB";
 import ContactMessage from "@/lib/models/ContactMessage";
+import { rateLimit, ADMIN_LIMIT } from "@/lib/rate-limit";
+import { logger } from "@/lib/logger";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
   try {
-    const { authorized, error } = await requireAdmin("contact_access");
+    const { authorized, error, user } = await requireAdmin("contact_access");
     if (!authorized) return error;
+
+    const rl = rateLimit(`admin:${user!.id}`, ADMIN_LIMIT);
+    if (!rl.success) {
+      return Response.json(
+        { success: false, message: "Too many requests" },
+        { status: 429, headers: { "Retry-After": "60" } },
+      );
+    }
 
     await connectDB();
 
@@ -44,7 +54,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (err) {
-    console.error("[admin/contact-messages GET]", err);
+    logger.error("Admin contact-messages GET failed", { err });
     return Response.json(
       { success: false, message: "Failed to fetch contact messages" },
       { status: 500 },

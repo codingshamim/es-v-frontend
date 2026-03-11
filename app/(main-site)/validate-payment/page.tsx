@@ -76,9 +76,8 @@ function CheckoutProgressSteps({ currentStep }: { currentStep: 1 | 2 | 3 }) {
     <div className="mb-8 flex items-center justify-center gap-0">
       <Link href="/cart" className="flex items-center gap-2 rounded-lg transition-colors hover:opacity-80">
         <div
-          className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
-            currentStep > 1 ? "bg-accent-green text-white" : currentStep === 1 ? "bg-accent-teal text-white" : "bg-gray-200 dark:bg-[#1a1a1a] text-gray-400 dark:text-gray-500"
-          }`}
+          className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${currentStep > 1 ? "bg-black text-white dark:bg-white dark:text-black" : currentStep === 1 ? "bg-black text-white dark:bg-white dark:text-black" : "bg-gray-200 dark:bg-[#1a1a1a] text-gray-400 dark:text-gray-500"
+            }`}
         >
           {currentStep > 1 ? (
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
@@ -88,16 +87,15 @@ function CheckoutProgressSteps({ currentStep }: { currentStep: 1 | 2 | 3 }) {
             "১"
           )}
         </div>
-        <span className={`text-sm font-bengali ${currentStep > 1 ? "font-medium text-accent-green" : currentStep === 1 ? "font-bold text-accent-teal" : "text-gray-400 dark:text-gray-500"}`}>
+        <span className={`text-sm font-bengali ${currentStep > 1 ? "font-medium text-black dark:text-white" : currentStep === 1 ? "font-bold text-black dark:text-white" : "text-gray-400 dark:text-gray-500"}`}>
           কার্ট
         </span>
       </Link>
-      <div className={`mx-3 h-px w-12 sm:w-20 ${currentStep > 1 ? "bg-accent-green" : "bg-gray-300 dark:bg-gray-600"}`} />
+      <div className={`mx-3 h-px w-12 sm:w-20 ${currentStep > 1 ? "bg-black/40 dark:bg-white/30" : "bg-gray-300 dark:bg-gray-600"}`} />
       <Link href="/checkout" className="flex items-center gap-2 rounded-lg transition-colors hover:opacity-80">
         <div
-          className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
-            currentStep > 2 ? "bg-accent-green text-white" : currentStep === 2 ? "bg-accent-teal text-white" : "bg-gray-200 dark:bg-[#1a1a1a] text-gray-400 dark:text-gray-500"
-          }`}
+          className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${currentStep > 2 ? "bg-black text-white dark:bg-white dark:text-black" : currentStep === 2 ? "bg-black text-white dark:bg-white dark:text-black" : "bg-gray-200 dark:bg-[#1a1a1a] text-gray-400 dark:text-gray-500"
+            }`}
         >
           {currentStep > 2 ? (
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
@@ -107,20 +105,19 @@ function CheckoutProgressSteps({ currentStep }: { currentStep: 1 | 2 | 3 }) {
             "২"
           )}
         </div>
-        <span className={`text-sm font-bengali ${currentStep > 2 ? "font-medium text-accent-green" : currentStep === 2 ? "font-bold text-accent-teal" : "text-gray-400 dark:text-gray-500"}`}>
+        <span className={`text-sm font-bengali ${currentStep > 2 ? "font-medium text-black dark:text-white" : currentStep === 2 ? "font-bold text-black dark:text-white" : "text-gray-400 dark:text-gray-500"}`}>
           চেকআউট
         </span>
       </Link>
-      <div className={`mx-3 h-px w-12 sm:w-20 ${currentStep > 2 ? "bg-accent-green" : "bg-gray-300 dark:bg-gray-600"}`} />
+      <div className={`mx-3 h-px w-12 sm:w-20 ${currentStep > 2 ? "bg-black/40 dark:bg-white/30" : "bg-gray-300 dark:bg-gray-600"}`} />
       <div className="flex items-center gap-2">
         <div
-          className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
-            currentStep === 3 ? "bg-accent-teal text-white" : "bg-gray-200 dark:bg-[#1a1a1a] text-gray-400 dark:text-gray-500"
-          }`}
+          className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${currentStep === 3 ? "bg-black text-white dark:bg-white dark:text-black" : "bg-gray-200 dark:bg-[#1a1a1a] text-gray-400 dark:text-gray-500"
+            }`}
         >
           ৩
         </div>
-        <span className={`text-sm font-bengali font-bold ${currentStep === 3 ? "text-accent-teal" : "text-gray-400 dark:text-gray-500"}`}>
+        <span className={`text-sm font-bengali font-bold ${currentStep === 3 ? "text-black dark:text-white" : "text-gray-400 dark:text-gray-500"}`}>
           সম্পন্ন
         </span>
       </div>
@@ -135,7 +132,7 @@ function formatPrice(amount: number) {
 function PaymentDetailsCard({ pricing, isCod }: { pricing: OrderPricing; isCod?: boolean }) {
   return (
     <div className="rounded-2xl border border-gray-200 dark:border-[#1a1a1a] bg-white dark:bg-[#0a0a0a] overflow-hidden shadow-sm">
-      <div className="bg-accent-teal/5 dark:bg-accent-teal/10 px-5 py-4 border-b border-gray-100 dark:border-[#1a1a1a]">
+      <div className="bg-black/5 dark:bg-white/5 px-5 py-4 border-b border-gray-100 dark:border-[#1a1a1a]">
         <h2 className="text-base font-bold text-black dark:text-white font-bengali">পেমেন্ট বিবরণ</h2>
         <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400 font-bengali">
           আপনার অর্ডারের সম্পূর্ণ মূল্য বিস্তারিত
@@ -169,7 +166,7 @@ function PaymentDetailsCard({ pricing, isCod }: { pricing: OrderPricing; isCod?:
         <div className="border-t-2 border-gray-200 dark:border-[#222] pt-4">
           <div className="flex items-center justify-between">
             <span className="text-base font-bold text-black dark:text-white font-bengali">মোট পরিশোধ</span>
-            <span className="text-2xl font-bold text-accent-teal">{formatPrice(pricing.total)}</span>
+            <span className="text-2xl font-bold text-black dark:text-white">{formatPrice(pricing.total)}</span>
           </div>
           {isCod && (
             <p className="text-xs text-gray-500 dark:text-gray-400 font-bengali mt-1">
@@ -196,14 +193,13 @@ function MobilePaymentOption({
     <button
       type="button"
       onClick={onSelect}
-      className={`flex flex-col items-center gap-2 rounded-xl border p-4 transition-all ${
-        selected
+      className={`flex flex-col items-center gap-2 rounded-xl border p-4 transition-all ${selected
           ? `${config.border} ${config.bg} ring-2 ring-offset-1 dark:ring-offset-black`
           : "border-gray-200 dark:border-[#1a1a1a] hover:border-gray-300 dark:hover:border-[#2a2a2a]"
-      }`}
+        }`}
       style={selected ? { ["--tw-ring-color" as string]: method === "bkash" ? "#ec4899" : method === "nagad" ? "#f97316" : "#a855f7" } : undefined}
     >
-      <div className={`flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br ${config.gradient}`}>
+      <div className={`flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br ${config.gradient}`}>
         <span className="text-lg font-bold text-white">{config.label[0]}</span>
       </div>
       <span className={`text-sm font-semibold ${selected ? config.color : "text-gray-700 dark:text-gray-300"}`}>
@@ -266,7 +262,7 @@ function VerificationForm({
   return (
     <div className="rounded-2xl border border-gray-200 dark:border-[#1a1a1a] bg-white dark:bg-[#0a0a0a] overflow-hidden shadow-sm">
       {/* Header */}
-      <div className={`bg-gradient-to-r ${config.gradient} p-5`}>
+      <div className={`bg-linear-to-r ${config.gradient} p-5`}>
         <div className="flex items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
             <span className="text-xl font-bold text-white">{config.label[0]}</span>
@@ -352,7 +348,7 @@ function VerificationForm({
                 value={senderNumber}
                 onChange={(e) => setSenderNumber(e.target.value)}
                 placeholder="01XXXXXXXXX"
-                className="w-full rounded-lg border border-gray-200 dark:border-[#1a1a1a] bg-gray-50 dark:bg-[#111] px-4 py-3 text-sm text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none transition-colors focus:border-accent-teal font-bengali"
+                className="w-full rounded-lg border border-gray-200 dark:border-[#1a1a1a] bg-gray-50 dark:bg-[#111] px-4 py-3 text-sm text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none transition-colors focus:border-black/40 dark:focus:border-white/30 font-bengali"
                 required
               />
             </div>
@@ -366,7 +362,7 @@ function VerificationForm({
                 value={transactionId}
                 onChange={(e) => setTransactionId(e.target.value)}
                 placeholder="যেমন: TXN123456789 অথবা TrxID123456"
-                className="w-full rounded-lg border border-gray-200 dark:border-[#1a1a1a] bg-gray-50 dark:bg-[#111] px-4 py-3 text-sm text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none transition-colors focus:border-accent-teal font-bengali"
+                className="w-full rounded-lg border border-gray-200 dark:border-[#1a1a1a] bg-gray-50 dark:bg-[#111] px-4 py-3 text-sm text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none transition-colors focus:border-black/40 dark:focus:border-white/30 font-bengali"
                 required
               />
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 font-bengali">
@@ -383,7 +379,7 @@ function VerificationForm({
             <button
               type="submit"
               disabled={!isValid || loading}
-              className={`flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r ${config.gradient} px-6 py-4 text-base font-semibold text-white transition-all hover:opacity-90 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60`}
+              className={`flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r ${config.gradient} px-6 py-4 text-base font-semibold text-white transition-all hover:opacity-90 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60`}
             >
               {loading ? (
                 <>
@@ -484,7 +480,7 @@ function CodFlow({
           </div>
           <div className="flex items-center justify-between pt-4 border-t-2 border-gray-200 dark:border-[#1a1a1a]">
             <span className="text-sm font-bold text-black dark:text-white font-bengali">সর্বমোট</span>
-            <span className="text-lg font-bold text-accent-teal">{formatPrice(pricing.total)}</span>
+            <span className="text-lg font-bold text-black dark:text-white">{formatPrice(pricing.total)}</span>
           </div>
           <div className="rounded-lg bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 px-4 py-3 mt-2">
             <p className="text-xs text-blue-800 dark:text-blue-200 font-bengali">
@@ -496,13 +492,13 @@ function CodFlow({
 
       {/* ডেলিভারি চার্জ অনলাইনে প্রথমে - only enabled methods */}
       {enabledOnlineMethods.length > 0 && (
-        <div className="rounded-2xl border-2 border-accent-teal/30 dark:border-accent-teal/40 bg-white dark:bg-[#0a0a0a] overflow-hidden shadow-sm">
-          <div className="px-5 py-4 bg-accent-teal/5 dark:bg-accent-teal/10 border-b border-accent-teal/20">
+        <div className="rounded-2xl border-2 border-black/10 dark:border-white/10 bg-white dark:bg-[#0a0a0a] overflow-hidden shadow-sm">
+          <div className="px-5 py-4 bg-black/5 dark:bg-white/5 border-b border-black/10 dark:border-white/10">
             <h4 className="text-base font-bold text-black dark:text-white font-bengali">
               ডেলিভারি চার্জ অনলাইনে পরিশোধ করুন (প্রথমে)
             </h4>
             <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 font-bengali">
-              নিচ থেকে আপনার পছন্দের পেমেন্ট পদ্ধতি বেছে নিয়ে {formatPrice(pricing.deliveryCharge)} ডেলিভারি চার্জ পরিশোধ করুন। 
+              নিচ থেকে আপনার পছন্দের পেমেন্ট পদ্ধতি বেছে নিয়ে {formatPrice(pricing.deliveryCharge)} ডেলিভারি চার্জ পরিশোধ করুন।
               পেমেন্টের পর নিচে Transaction ID দিয়ে যাচাই করুন।
             </p>
           </div>
@@ -538,7 +534,7 @@ function CodFlow({
         <div className="rounded-2xl border border-gray-200 dark:border-[#1a1a1a] bg-white dark:bg-[#0a0a0a] p-5">
           <div className="mb-4 p-4 rounded-xl bg-gray-50 dark:bg-[#111] border border-gray-100 dark:border-[#1a1a1a]">
             <p className="text-sm text-gray-700 dark:text-gray-300 font-bengali">
-              <strong>বিকল্প:</strong> ডেলিভারি চার্জ এখনই অনলাইনে না দিলে, নিচে ক্লিক করে অর্ডার নিশ্চিত করুন। 
+              <strong>বিকল্প:</strong> ডেলিভারি চার্জ এখনই অনলাইনে না দিলে, নিচে ক্লিক করে অর্ডার নিশ্চিত করুন।
               ডেলিভারির সময় ডেলিভারি চার্জসহ সাবটোটাল মোট টাকা নগদ পরিশোধ করবেন।
             </p>
           </div>
@@ -599,7 +595,7 @@ function ValidatePaymentContent() {
       .then((json) => {
         if (json.success && json.data) setSettings(json.data);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   useEffect(() => {
@@ -631,7 +627,7 @@ function ValidatePaymentContent() {
     return (
       <main className="flex min-h-[60vh] items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <Spinner size="lg" className="text-accent-teal" />
+          <Spinner size="lg" className="text-black dark:text-white" />
           <p className="text-sm text-gray-500 dark:text-gray-400 font-bengali">অর্ডার লোড হচ্ছে...</p>
         </div>
       </main>
@@ -671,7 +667,7 @@ function ValidatePaymentContent() {
 
         {/* Header */}
         <div className="mb-8 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent-teal/10 text-accent-teal text-sm font-semibold font-bengali mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/5 dark:bg-white/10 text-black dark:text-white text-sm font-semibold font-bengali mb-4">
             <span>Order ID</span>
             <span className="font-mono">{orderId}</span>
           </div>
@@ -712,19 +708,19 @@ function ValidatePaymentContent() {
           <div className="rounded-xl bg-gray-50 dark:bg-[#0a0a0a] border border-gray-100 dark:border-[#1a1a1a] p-5">
             <h4 className="text-sm font-bold text-black dark:text-white font-bengali mb-2">সহায়তা</h4>
             <ul className="text-xs text-gray-600 dark:text-gray-400 font-bengali space-y-1.5">
-              <li>• অর্ডার ট্র্যাক করতে: <Link href="/track-order" className="text-accent-teal hover:underline">ট্র্যাক অর্ডার</Link></li>
+              <li>• অর্ডার ট্র্যাক করতে: <Link href="/track-order" className="text-black dark:text-white hover:underline">ট্র্যাক অর্ডার</Link></li>
               <li>• Transaction ID পাচ্ছেন না? bKash/Nagad/Rocket অ্যাপে পেমেন্ট সম্পন্ন হলে SMS বা অ্যাপের হিস্টোরিতে দেখা যাবে</li>
               <li>• কোনো সমস্যা? ফোন বা ইমেইলে যোগাযোগ করুন</li>
             </ul>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
-            <Link href="/" className="font-medium text-accent-teal hover:underline font-bengali">
+            <Link href="/" className="font-medium text-black dark:text-white hover:underline font-bengali">
               হোমে ফিরে যান
             </Link>
-            <Link href="/shop" className="font-medium text-gray-600 dark:text-gray-400 hover:text-accent-teal transition font-bengali">
+            <Link href="/shop" className="font-medium text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition font-bengali">
               শপিং চালিয়ে যান
             </Link>
-            <Link href="/track-order" className="font-medium text-gray-600 dark:text-gray-400 hover:text-accent-teal transition font-bengali">
+            <Link href="/track-order" className="font-medium text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition font-bengali">
               অর্ডার ট্র্যাক করুন
             </Link>
           </div>
@@ -739,7 +735,7 @@ export default function ValidatePaymentPage() {
     <Suspense
       fallback={
         <main className="flex min-h-[60vh] items-center justify-center">
-          <Spinner size="lg" className="text-accent-teal" />
+          <Spinner size="lg" className="text-black dark:text-white" />
         </main>
       }
     >

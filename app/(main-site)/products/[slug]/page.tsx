@@ -74,7 +74,7 @@ interface RelatedProduct {
 }
 
 const COLORS_FOR_AVATAR = [
-  "bg-accent-teal",
+  "bg-black",
   "bg-blue-500",
   "bg-purple-500",
   "bg-orange-500",
@@ -128,7 +128,7 @@ function ReviewCard({ review, index }: { review: ReviewData; index: number }) {
   const timeAgo = getTimeAgo(date);
 
   return (
-    <article className="group relative overflow-hidden rounded-2xl bg-white dark:bg-[#0d0d0d] p-6 shadow-sm ring-1 ring-gray-200/80 dark:ring-white/[0.06] transition-all hover:shadow-md hover:ring-gray-300/80 dark:hover:ring-white/[0.1]">
+    <article className="group relative overflow-hidden rounded-2xl bg-white dark:bg-[#0d0d0d] p-6 shadow-sm ring-1 ring-gray-200/80 dark:ring-white/6 transition-all hover:shadow-md hover:ring-gray-300/80 dark:hover:ring-white/10">
       <div className="flex items-start gap-4">
         <div className={`relative shrink-0 w-12 h-12 rounded-2xl ${bgColor} flex items-center justify-center text-white font-bold text-lg shadow-inner ring-2 ring-white/20 dark:ring-black/20`}>
           {initial}
@@ -138,7 +138,7 @@ function ReviewCard({ review, index }: { review: ReviewData; index: number }) {
             <div className="flex items-center gap-2 flex-wrap">
               <h4 className="font-semibold text-black dark:text-white">{review.name}</h4>
               {review.isVerifiedPurchase && (
-                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-accent-green bg-accent-green/15 dark:bg-accent-green/20 px-2 py-1 rounded-lg">
+                <span className="inline-flex items-center gap-1 text-[11px] font-medium text-black bg-black/5 dark:text-white dark:bg-white/10 px-2 py-1 rounded-lg">
                   <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
@@ -155,8 +155,8 @@ function ReviewCard({ review, index }: { review: ReviewData; index: number }) {
             {review.comment}
           </p>
           {review.adminReply?.text && (
-            <div className="mt-4 rounded-xl bg-gradient-to-br from-accent-teal/10 to-accent-teal/5 dark:from-accent-teal/15 dark:to-accent-teal/5 p-4 ring-1 ring-accent-teal/20">
-              <p className="text-xs font-semibold text-accent-teal uppercase tracking-wider mb-1.5 font-bengali">
+            <div className="mt-4 rounded-xl bg-linear-to-br from-black/5 to-black/0 dark:from-white/10 dark:to-white/0 p-4 ring-1 ring-black/10 dark:ring-white/10">
+              <p className="text-xs font-semibold text-black/70 dark:text-white/70 uppercase tracking-wider mb-1.5 font-bengali">
                 স্টোর রিপ্লাই
               </p>
               <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-bengali">
@@ -293,7 +293,7 @@ export default function ProductDetailPage() {
           );
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [product]);
 
   useEffect(() => {
@@ -423,7 +423,7 @@ export default function ProductDetailPage() {
     return (
       <main className="flex min-h-[60vh] items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <Spinner size="lg" className="text-accent-teal" />
+          <Spinner size="lg" className="text-black dark:text-white" />
           <p className="text-sm text-gray-500 dark:text-gray-400 font-bengali">পণ্য লোড হচ্ছে...</p>
         </div>
       </main>
@@ -461,7 +461,7 @@ export default function ProductDetailPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12">
               {/* Image Gallery */}
               <div className="relative">
-                <div className="relative bg-gray-100 dark:bg-[#1a1a1a] rounded-2xl overflow-hidden aspect-square lg:aspect-[4/5]">
+                <div className="relative bg-gray-100 dark:bg-[#1a1a1a] rounded-2xl overflow-hidden aspect-square lg:aspect-4/5">
                   <Image
                     src={mainImage}
                     alt={product.name}
@@ -503,11 +503,10 @@ export default function ProductDetailPage() {
                             setMainImage(img);
                           }
                         }}
-                        className={`w-16 h-16 shrink-0 rounded-lg overflow-hidden border-2 transition-all ${
-                          mainImage === img
-                            ? "border-accent-teal"
+                        className={`w-16 h-16 shrink-0 rounded-lg overflow-hidden border-2 transition-all ${mainImage === img
+                            ? "border-black dark:border-white"
                             : "border-transparent opacity-60 hover:opacity-100"
-                        }`}
+                          }`}
                       >
                         <Image src={img} alt={`${product.name} ${i + 1}`} width={64} height={64} className="w-full h-full object-cover" />
                       </button>
@@ -559,7 +558,7 @@ export default function ProductDetailPage() {
                       <span className="text-sm font-medium text-black dark:text-white font-bengali">সাইজ</span>
                       <button
                         onClick={() => setSizeChartOpen(true)}
-                        className="text-sm text-accent-teal hover:underline font-bengali"
+                        className="text-sm text-gray-700 dark:text-gray-300 hover:underline font-bengali"
                       >
                         সাইজ বিস্তারিত
                       </button>
@@ -576,13 +575,12 @@ export default function ProductDetailPage() {
                               setSelectedSize(size.label);
                               if (validationMsg) setValidationMsg("");
                             }}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all border ${
-                              isOOS
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all border ${isOOS
                                 ? "border-gray-200 dark:border-gray-800 text-gray-300 dark:text-gray-600 cursor-not-allowed line-through"
                                 : isSelected
-                                  ? "border-accent-teal bg-accent-teal/10 text-accent-teal"
-                                  : "border-gray-300 dark:border-[#3a3a3a] text-gray-700 dark:text-white hover:border-accent-teal hover:text-accent-teal"
-                            }`}
+                                  ? "border-black bg-black/5 text-black dark:border-white dark:bg-white/10 dark:text-white"
+                                  : "border-gray-300 dark:border-[#3a3a3a] text-gray-700 dark:text-white hover:border-black hover:text-black dark:hover:border-white dark:hover:text-white"
+                              }`}
                           >
                             {size.label}
                           </button>
@@ -614,11 +612,10 @@ export default function ProductDetailPage() {
                               setSelectedColorName(color.name);
                               if (validationMsg && selectedSize) setValidationMsg("");
                             }}
-                            className={`w-10 h-10 rounded-full border-2 transition-all ${
-                              isSelected
-                                ? "ring-2 ring-accent-teal ring-offset-2 ring-offset-white dark:ring-offset-black border-transparent"
+                            className={`w-10 h-10 rounded-full border-2 transition-all ${isSelected
+                                ? "ring-2 ring-black/60 dark:ring-white/60 ring-offset-2 ring-offset-white dark:ring-offset-black border-transparent"
                                 : "border-gray-300 dark:border-[#3a3a3a] hover:scale-110"
-                            }`}
+                              }`}
                             style={{ backgroundColor: color.hex }}
                             title={color.name}
                           />
@@ -648,7 +645,7 @@ export default function ProductDetailPage() {
                       const v = parseInt(e.target.value, 10);
                       if (!isNaN(v)) setQuantity(Math.max(1, Math.min(10, v)));
                     }}
-                    className="w-16 h-10 rounded-md border border-gray-300 dark:border-[#3a3a3a] bg-transparent text-center text-black dark:text-white focus:outline-none focus:border-accent-teal [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-16 h-10 rounded-md border border-gray-300 dark:border-[#3a3a3a] bg-transparent text-center text-black dark:text-white focus:outline-none focus:border-black/50 dark:focus:border-white/50 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <button
                     onClick={() => setQuantity((q) => Math.min(10, q + 1))}
@@ -693,7 +690,7 @@ export default function ProductDetailPage() {
                     <ul className="space-y-2 text-gray-600 dark:text-[#a0a0a0] text-sm">
                       {product.features.map((f, i) => (
                         <li key={i} className="flex items-start gap-2">
-                          <span className="w-1.5 h-1.5 rounded-full bg-accent-teal mt-2 shrink-0" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-black/60 dark:bg-white/60 mt-2 shrink-0" />
                           {f}
                         </li>
                       ))}
@@ -701,38 +698,7 @@ export default function ProductDetailPage() {
                   </div>
                 )}
 
-                {/* Size Chart */}
-                {product.sizes.length > 0 && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-black dark:text-white mb-4">
-                      Size Chart
-                    </h3>
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm border border-gray-200 dark:border-[#2a2a2a] rounded-lg overflow-hidden">
-                        <thead>
-                          <tr className="bg-gray-100 dark:bg-[#1a1a1a]">
-                            <th className="px-4 py-3 text-left text-gray-700 dark:text-white font-medium">Size</th>
-                            <th className="px-4 py-3 text-center text-gray-700 dark:text-white font-medium">Measurement</th>
-                            <th className="px-4 py-3 text-center text-gray-700 dark:text-white font-medium">Stock</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200 dark:divide-[#2a2a2a]">
-                          {product.sizes.map((size) => (
-                            <tr key={size.label} className="hover:bg-gray-50 dark:hover:bg-[#111111]">
-                              <td className="px-4 py-3 text-gray-700 dark:text-white">{size.label}</td>
-                              <td className="px-4 py-3 text-center text-gray-600 dark:text-[#a0a0a0]">
-                                {size.measurement || "—"}
-                              </td>
-                              <td className="px-4 py-3 text-center text-gray-600 dark:text-[#a0a0a0]">
-                                {size.stock > 0 ? size.stock : "Out"}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
+
               </div>
             </div>
           </div>
@@ -744,14 +710,14 @@ export default function ProductDetailPage() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-1 h-6 bg-gradient-to-b from-accent-teal to-blue-500 rounded-full" />
+                  <div className="w-1 h-6 bg-linear-to-b from-black/60 to-black/10 dark:from-white/60 dark:to-white/10 rounded-full" />
                   <h2 className="text-xl lg:text-2xl font-bold text-black dark:text-white font-bengali">
                     আপনার পছন্দ হতে পারে
                   </h2>
                 </div>
                 <Link
                   href="/shop"
-                  className="flex items-center gap-1 text-accent-teal text-sm hover:gap-2 transition-all"
+                  className="flex items-center gap-1 text-black/70 dark:text-white/70 text-sm hover:gap-2 transition-all"
                 >
                   সব দেখুন
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -768,8 +734,8 @@ export default function ProductDetailPage() {
                       href={`/products/${rp.slug}`}
                       className="shrink-0 w-[180px] sm:w-[220px] group snap-start"
                     >
-                      <div className="relative overflow-hidden rounded-2xl border border-gray-200/50 dark:border-[#2a2a2a] transition-all duration-300 hover:border-accent-teal/50 hover:shadow-xl hover:shadow-accent-teal/5">
-                        <div className="relative aspect-[4/5] overflow-hidden">
+                      <div className="relative overflow-hidden rounded-2xl border border-gray-200/50 dark:border-[#2a2a2a] transition-all duration-300 hover:border-black/40 dark:hover:border-white/20 hover:shadow-xl hover:shadow-black/5 dark:hover:shadow-white/5">
+                        <div className="relative aspect-4/5 overflow-hidden">
                           <Image
                             src={rp.images.main}
                             alt={rp.name}
@@ -792,7 +758,7 @@ export default function ProductDetailPage() {
                               <span className="text-[10px] text-gray-400">({rp.ratings.count})</span>
                             </div>
                           )}
-                          <h3 className="text-sm font-semibold text-black dark:text-white truncate mb-2 group-hover:text-accent-teal transition-colors">
+                          <h3 className="text-sm font-semibold text-black dark:text-white truncate mb-2 group-hover:text-black/70 dark:group-hover:text-white/80 transition-colors">
                             {rp.name}
                           </h3>
                           <div className="flex items-center gap-2">
@@ -801,7 +767,7 @@ export default function ProductDetailPage() {
                                 ৳{rp.pricing.regularPrice}
                               </span>
                             )}
-                            <span className="text-base font-bold text-accent-teal">৳{rpPrice}</span>
+                            <span className="text-base font-bold text-black dark:text-white">৳{rpPrice}</span>
                           </div>
                         </div>
                       </div>
@@ -840,7 +806,7 @@ export default function ProductDetailPage() {
             {session && canReview ? (
               <form
                 onSubmit={handleReviewSubmit}
-                className="mb-10 rounded-2xl bg-white dark:bg-[#0d0d0d] p-6 sm:p-8 shadow-sm ring-1 ring-gray-200/80 dark:ring-white/[0.06]"
+                className="mb-10 rounded-2xl bg-white dark:bg-[#0d0d0d] p-6 sm:p-8 shadow-sm ring-1 ring-gray-200/80 dark:ring-white/6"
               >
                 <h3 className="text-lg font-semibold text-black dark:text-white mb-6 font-bengali">
                   আপনার রিভিউ লিখুন
@@ -866,7 +832,7 @@ export default function ProductDetailPage() {
                       value={reviewComment}
                       onChange={(e) => setReviewComment(e.target.value)}
                       placeholder="এই প্রোডাক্ট সম্পর্কে আপনার অভিজ্ঞতা শেয়ার করুন..."
-                      className="w-full px-4 py-3.5 bg-gray-50 dark:bg-[#141414] border-0 rounded-xl text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent-teal/50 resize-none text-sm transition-shadow"
+                      className="w-full px-4 py-3.5 bg-gray-50 dark:bg-[#141414] border-0 rounded-xl text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black/20 dark:focus:ring-white/20 resize-none text-sm transition-shadow"
                       maxLength={2000}
                     />
                   </div>
@@ -875,19 +841,19 @@ export default function ProductDetailPage() {
                   <p className="mt-3 text-sm text-red-500 font-bengali">{reviewError}</p>
                 )}
                 {reviewSuccess && (
-                  <p className="mt-3 text-sm text-accent-green font-bengali">{reviewSuccess}</p>
+                  <p className="mt-3 text-sm text-black/70 dark:text-white/70 font-bengali">{reviewSuccess}</p>
                 )}
                 <button
                   type="submit"
                   disabled={reviewSubmitting}
-                  className="mt-6 w-full sm:w-auto px-8 py-3.5 bg-accent-teal text-white rounded-xl text-sm font-semibold hover:bg-accent-teal/90 transition-all hover:shadow-lg hover:shadow-accent-teal/20 font-bengali disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="mt-6 w-full sm:w-auto px-8 py-3.5 bg-black text-white dark:bg-white dark:text-black rounded-xl text-sm font-semibold hover:bg-black/90 dark:hover:bg-white/90 transition-all hover:shadow-lg hover:shadow-black/10 dark:hover:shadow-white/10 font-bengali disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {reviewSubmitting && <Spinner size="sm" className="text-white" />}
                   রিভিউ সাবমিট করুন
                 </button>
               </form>
             ) : !session ? (
-              <div className="mb-10 rounded-2xl bg-white dark:bg-[#0d0d0d] p-8 text-center ring-1 ring-gray-200/80 dark:ring-white/[0.06]">
+              <div className="mb-10 rounded-2xl bg-white dark:bg-[#0d0d0d] p-8 text-center ring-1 ring-gray-200/80 dark:ring-white/6">
                 <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-gray-100 dark:bg-[#1a1a1a] flex items-center justify-center">
                   <svg className="w-7 h-7 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
@@ -901,9 +867,9 @@ export default function ProductDetailPage() {
                 </Button>
               </div>
             ) : (
-              <div className="mb-10 rounded-2xl bg-white dark:bg-[#0d0d0d] p-8 text-center ring-1 ring-gray-200/80 dark:ring-white/[0.06]">
-                <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-accent-teal/10 dark:bg-accent-teal/20 flex items-center justify-center">
-                  <svg className="w-7 h-7 text-accent-teal" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <div className="mb-10 rounded-2xl bg-white dark:bg-[#0d0d0d] p-8 text-center ring-1 ring-gray-200/80 dark:ring-white/6">
+                <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-black/5 dark:bg-white/10 flex items-center justify-center">
+                  <svg className="w-7 h-7 text-black dark:text-white" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                   </svg>
                 </div>
@@ -927,7 +893,7 @@ export default function ProductDetailPage() {
                         setReviewPage(next);
                         fetchReviews(next);
                       }}
-                      className="px-8 py-3.5 rounded-xl bg-white dark:bg-[#0d0d0d] text-gray-700 dark:text-gray-300 font-medium ring-1 ring-gray-200/80 dark:ring-white/[0.06] hover:bg-gray-50 dark:hover:bg-[#141414] hover:ring-gray-300/80 dark:hover:ring-white/10 transition-all font-bengali"
+                      className="px-8 py-3.5 rounded-xl bg-white dark:bg-[#0d0d0d] text-gray-700 dark:text-gray-300 font-medium ring-1 ring-gray-200/80 dark:ring-white/6 hover:bg-gray-50 dark:hover:bg-[#141414] hover:ring-gray-300/80 dark:hover:ring-white/10 transition-all font-bengali"
                     >
                       আরো দেখুন
                     </button>
@@ -935,7 +901,7 @@ export default function ProductDetailPage() {
                 )}
               </div>
             ) : (
-              <div className="rounded-2xl bg-white dark:bg-[#0d0d0d] p-12 text-center ring-1 ring-gray-200/80 dark:ring-white/[0.06]">
+              <div className="rounded-2xl bg-white dark:bg-[#0d0d0d] p-12 text-center ring-1 ring-gray-200/80 dark:ring-white/6">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gray-100 dark:bg-[#1a1a1a] flex items-center justify-center">
                   <svg className="w-8 h-8 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.25} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
@@ -959,7 +925,7 @@ export default function ProductDetailPage() {
 
       {/* Cart Toast */}
       {cartToast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-200 px-5 py-3 rounded-xl bg-accent-green text-white text-sm font-semibold font-bengali shadow-lg animate-fade-in-up pointer-events-none">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-200 px-5 py-3 rounded-xl bg-black text-white dark:bg-white dark:text-black text-sm font-semibold font-bengali shadow-lg animate-fade-in-up pointer-events-none">
           কার্টে যোগ করা হয়েছে!
         </div>
       )}

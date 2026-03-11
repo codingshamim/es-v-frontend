@@ -33,8 +33,15 @@ interface NotificationSettings {
   newReviewNotification: boolean;
 }
 
+interface SocialSettings {
+  facebook: string;
+  instagram: string;
+  linkedin: string;
+}
+
 interface Settings {
   store: StoreSettings;
+  social: SocialSettings;
   shipping: ShippingSettings;
   payment: PaymentSettings;
   notifications: NotificationSettings;
@@ -42,6 +49,7 @@ interface Settings {
 
 function normalizeSettings(d: {
   store?: Partial<StoreSettings>;
+  social?: Partial<SocialSettings>;
   shipping?: Partial<ShippingSettings>;
   payment?: Partial<PaymentSettings>;
   notifications?: Partial<NotificationSettings>;
@@ -52,6 +60,11 @@ function normalizeSettings(d: {
       storeEmail: String(d.store?.storeEmail ?? ""),
       storePhone: String(d.store?.storePhone ?? ""),
       storeAddress: String(d.store?.storeAddress ?? ""),
+    },
+    social: {
+      facebook: String(d.social?.facebook ?? ""),
+      instagram: String(d.social?.instagram ?? ""),
+      linkedin: String(d.social?.linkedin ?? ""),
     },
     shipping: {
       dhakaCharge: Number(d.shipping?.dhakaCharge ?? 60),
@@ -81,6 +94,11 @@ const defaultSettings: Settings = {
     storeEmail: "",
     storePhone: "",
     storeAddress: "",
+  },
+  social: {
+    facebook: "",
+    instagram: "",
+    linkedin: "",
   },
   shipping: {
     dhakaCharge: 60,
@@ -178,6 +196,13 @@ export default function SettingsPage() {
     setSettings((prev) => ({
       ...prev,
       store: { ...prev.store, [field]: value },
+    }));
+  };
+
+  const updateSocial = (field: keyof SocialSettings, value: string) => {
+    setSettings((prev) => ({
+      ...prev,
+      social: { ...prev.social, [field]: value },
     }));
   };
 
@@ -517,6 +542,87 @@ export default function SettingsPage() {
                 updateNotifications("newReviewNotification", val)
               }
             />
+          </div>
+        </div>
+      </div>
+
+      {/* Social Media */}
+      <div className="bg-white dark:bg-[#0a0a0a] rounded-2xl p-6">
+        <h2 className="text-lg font-semibold text-black dark:text-white mb-1">
+          Social Media
+        </h2>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          These links show in the main site footer “Follow Us”.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1.5">
+              Facebook URL
+            </label>
+            <input
+              type="url"
+              value={settings.social.facebook}
+              onChange={(e) => updateSocial("facebook", e.target.value)}
+              placeholder="https://facebook.com/yourpage"
+              className="w-full bg-gray-100 dark:bg-white/5 border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-white/50 dark:focus:ring-white/50 transition-all"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1.5">
+              Instagram URL
+            </label>
+            <input
+              type="url"
+              value={settings.social.instagram}
+              onChange={(e) => updateSocial("instagram", e.target.value)}
+              placeholder="https://instagram.com/yourhandle"
+              className="w-full bg-gray-100 dark:bg-white/5 border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-white/50 dark:focus:ring-white/50 transition-all"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1.5">
+              LinkedIn URL
+            </label>
+            <input
+              type="url"
+              value={settings.social.linkedin}
+              onChange={(e) => updateSocial("linkedin", e.target.value)}
+              placeholder="https://linkedin.com/company/yourcompany"
+              className="w-full bg-gray-100 dark:bg-white/5 border-none rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-white/50 dark:focus:ring-white/50 transition-all"
+            />
+          </div>
+
+          <div className="rounded-xl bg-gray-50 dark:bg-white/5 p-4">
+            <p className="text-sm font-semibold text-black dark:text-white mb-2">
+              Preview
+            </p>
+            <div className="flex flex-wrap gap-3">
+              {[
+                { name: "Facebook", href: settings.social.facebook },
+                { name: "Instagram", href: settings.social.instagram },
+                { name: "LinkedIn", href: settings.social.linkedin },
+              ]
+                .filter((l) => l.href.trim())
+                .map((l) => (
+                  <span
+                    key={l.name}
+                    className="text-sm text-gray-700 dark:text-gray-300"
+                    title={l.href}
+                  >
+                    {l.name}
+                  </span>
+                ))}
+              {!settings.social.facebook.trim() &&
+                !settings.social.instagram.trim() &&
+                !settings.social.linkedin.trim() && (
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    No social links set.
+                  </span>
+                )}
+            </div>
           </div>
         </div>
       </div>

@@ -34,6 +34,15 @@ function pickPayment(doc: Record<string, unknown>) {
   };
 }
 
+function pickSocial(doc: Record<string, unknown>) {
+  const s = doc.social as Record<string, unknown> | undefined;
+  return {
+    facebook: String(s?.facebook ?? ""),
+    instagram: String(s?.instagram ?? ""),
+    linkedin: String(s?.linkedin ?? ""),
+  };
+}
+
 /**
  * Public API: returns store, shipping, and payment settings for the main site.
  * Prefers nested structure (store, shipping, payment) over legacy flat keys.
@@ -48,6 +57,7 @@ export async function GET() {
         success: true,
         data: {
           store: { storeName: "", storeEmail: "", storePhone: "", storeAddress: "" },
+          social: { facebook: "", instagram: "", linkedin: "" },
           shipping: { dhakaCharge: 60, outsideDhakaCharge: 120, freeShippingMin: 0 },
           payment: {
             codEnabled: true,
@@ -64,6 +74,7 @@ export async function GET() {
     const d = doc as unknown as Record<string, unknown>;
     const data = {
       store: pickStore(d),
+      social: pickSocial(d),
       shipping: pickShipping(d),
       payment: pickPayment(d),
     };
